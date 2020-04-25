@@ -1,25 +1,26 @@
 #include<stdio.h>
 #include"Scheduler.h"
+#include <signal.h>
+#include <setjmp.h>
+#include <unistd.h>
+
+int cur_task = 20; // 0-> High 19->Low
+
 
 int Sched_Init(void){
     for(int x=0; x<20; x++)
         Tasks[x].func = 0;
-    /*
-    * Also configures
-    * interrupt that
-    * periodically calls
-    * Sched_Schedule().
-    * now calls int_handler()
-    */
+     int i;
 }
 
-int Sched_AddT(void (*f)(void),int d, int p,int pri){
+int Sched_AddT(void (*f)(int),int d, int p,int pri,int wce){
     //for(int x=0; x<20; x++)
         if (!Tasks[pri].func) {
             Tasks[pri].period = p;
             Tasks[pri].delay = d;
             Tasks[pri].exec = 0;
             Tasks[pri].func = f;
+            Tasks[pri].wce = wce;
             return pri;
         }
     return -1;
@@ -28,11 +29,14 @@ int Sched_AddT(void (*f)(void),int d, int p,int pri){
 void Sched_Schedule(void) {
     for(int x=0; x<20; x++) {
         if(Tasks[x].func){
+            if (!Tasks[x].func)
+                continue;
             if(Tasks[x].delay){
                 Tasks[x].delay--;
             }   
             else {
                 /* Schedule Task */
+                //printf("Task  %d scheduled\n",x);
                 Tasks[x].exec++;
                 Tasks[x].delay = Tasks[x].period-1; //why?
             }
@@ -41,15 +45,18 @@ void Sched_Schedule(void) {
 }
 
 void Sched_Dispatch(void) {
-    for(int x=0; x<20; x++) {
+    int prev_task = cur_task;
+    for(int x=0; x<cur_task; x++) {
         if((Tasks[x].func)&&(Tasks[x].exec)){
             Tasks[x].exec--;
-            Tasks[x].func();
+            cur_task = x;
+            Tasks[x].func(x);
+            cur_task = prev_task;
             
             // Delete task if one-shot
             if(!Tasks[x].period)
                 Tasks[x].func = 0;
-        return;
+        //return;
         }
     }
 }

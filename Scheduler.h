@@ -4,12 +4,14 @@ int period;
 /* ticks until next activation */
 int delay;
 /* function pointer */
-void (*func)(void);
+void (*func)(int);
 /* activation counter */
 int exec;
+int wce;
 } Sched_Task_t;
 
 Sched_Task_t Tasks[20]; //array off structures for all tasks
+// int cur_task = 20; // 0-> High 19->Low
 
 int Sched_Init(void);
 /* - Initialise data
@@ -17,7 +19,7 @@ int Sched_Init(void);
 *
 * - Configure interrupt
 * that periodically
-* calls
+* calls int_handler()
 * Sched_Schedule().
 */
 
@@ -33,11 +35,14 @@ void Sched_Schedule(void);
 
 void Sched_Dispatch(void); 
 /* Verifies if any task
+* with higher priority than the currently
+* executing task,
 * has an activation
 * counter > 0,
 * and if so, calls that
 * task.
 */
 
-int Sched_AddT(void (*f)(void),int d, int p,int pri);
+int Sched_AddT(void (*f)(int),int d, int p,int pri,int wce);
     //adds a task to the schedule
+
