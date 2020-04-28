@@ -4,11 +4,10 @@
 #include <setjmp.h>
 #include <unistd.h>
 
-int cur_task = 20; // 0-> High 19->Low
-
+int cur_task = TaskSetSize; // 0-> High 19->Low
 
 int Sched_Init(void){
-    for(int x=0; x<20; x++)
+    for(int x=0; x<TaskSetSize; x++)
         Tasks[x].func = 0;
      int i;
 }
@@ -21,13 +20,22 @@ int Sched_AddT(void (*f)(int),int d, int p,int pri,int wce){
             Tasks[pri].exec = 0;
             Tasks[pri].func = f;
             Tasks[pri].wce = wce;
+            Tasks[pri].id  = pri;
             return pri;
         }
     return -1;
 }
 
+void TaskSet_New(int id){
+    set[id].id = id;
+}
+
+void TaskSet_Add(int taskid,int setid, Sched_Task_t newtask){
+    set[setid].task[taskid] = newtask;
+}
+
 void Sched_Schedule(void) {
-    for(int x=0; x<20; x++) {
+    for(int x=0; x<TaskSetSize; x++) {
         if(Tasks[x].func){
             if (!Tasks[x].func)
                 continue;

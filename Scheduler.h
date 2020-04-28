@@ -1,3 +1,6 @@
+#define TaskSetSize 5
+#define Nsets 1000
+
 typedef struct {
 /* period in ticks */
 int period;
@@ -8,9 +11,16 @@ void (*func)(int);
 /* activation counter */
 int exec;
 int wce;
+int id;
 } Sched_Task_t;
 
-Sched_Task_t Tasks[20]; //array off structures for all tasks
+typedef struct {
+Sched_Task_t task[TaskSetSize];
+int id;
+} Task_set;
+
+Sched_Task_t Tasks[TaskSetSize]; //array off structures for all tasks
+Task_set set[Nsets];
 // int cur_task = 20; // 0-> High 19->Low
 
 int Sched_Init(void);
