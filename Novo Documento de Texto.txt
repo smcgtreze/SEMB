@@ -1,0 +1,6 @@
+change tick-based into tick-less
+numbers -> response time
+update for the idea for the project -> decide exactly what to do
+Utilization
+Worst Case Execution
+How many tasks are scalable
