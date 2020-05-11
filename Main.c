@@ -49,8 +49,45 @@ int save_hist(char *filename,int *vec,int size){
 
   if(vec != NULL){
     for(int i=0;i < size;i++){
-      fprintf(file, "%lf,%d\n",(double)i*ISize,vec[i]);
+      fprintf(file, "%d,%.3lf\n",vec[i], (double)i*ISize);
     }
+  }
+}
+
+int responsetimeanalysis(int *C,int *T,int *D,int size, int n){
+
+  float RWC1, RWC2=0;
+  int i, j, k;
+
+  for(i=0; i<size; i++){
+
+    RWC1=0;
+    RWC2=0;
+    for(k=0; k<i+1; k++){
+      RWC1 = RWC1+C[k];
+    }
+    //printf("RWC1a = %f\n", RWC1);
+    while(RWC1 != RWC2){
+        if(RWC2 != 0) RWC1 = RWC2;
+      //  printf("RWC1b = %f\n", RWC1);
+      //  printf("RWC2c = %f\n", RWC2);
+        RWC2 = 0;
+        for(j=0; j<i; j++){
+          RWC2 = RWC2+ceil(RWC1/T[j])*C[j];
+        //  printf("RWC2d = %f\n", RWC2);
+        }
+        RWC2 = RWC2 + C[i];
+      //  printf("RWC2e = %f\n", RWC2);
+      //  printf("i = %d\n",i);
+        if(RWC2 > D[i]){
+          printf("RTA: TASK SET %d NOT SCHEDULABLE\n", n);
+          return 0;
+        }
+    }
+  }
+  if(RWC1 == RWC2){
+    printf("RTA: TASK SET %d IS SCHEDULABLE\n", n);
+    return 1;
   }
 }
 
@@ -143,7 +180,7 @@ int main (int argc, char *argv[]){
     int *period = malloc(sizeof(int)*10*TaskSetSize),*C=malloc(sizeof(int)*10*TaskSetSize),*deadline = malloc(sizeof(int)*10*TaskSetSize);
     double *util = malloc(sizeof(double)*10*TaskSetSize);
     double *aux = malloc(sizeof(double)*10*Nsets);
-    int positive =0, positive2 =0,indetermined = 0;
+    int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0;
     srand((unsigned)(time(NULL)));
     memset(histograma,0,0);
     memset(aux,0,0);
@@ -229,6 +266,30 @@ int main (int argc, char *argv[]){
           }
         }
 
+        //RESPONSE TIME ANALYSIS
+        if(strcmp(str,"rm") == 0)
+          if(responsetimeanalysis(C, period, deadline, TaskSetSize, j)==1)
+            rta_counter++;
+
+        if(strcmp(str,"dm") == 0){
+          for (int i=0; i<TaskSetSize; i++)
+          {
+            if(deadline[i]>=period[i])
+            {
+              counter++;
+            }
+          }
+
+          if(counter == TaskSetSize){
+            counter = 0;
+            if(responsetimeanalysis(C, period, deadline, TaskSetSize, j)==1)
+              rta_counter++;
+          }
+
+          else
+            counter = 0;
+        }
+
     //save("Util_avg.csv",0,util,TaskSetSize);
     //Calculation of the distribution of the utilizations
     for (int j = 0; j < TaskSetSize;j++){
@@ -260,6 +321,7 @@ int main (int argc, char *argv[]){
     printf("Hyperbolic Condition :%.4f dos task sets são escalonáveis\n",((double)1.0*positive/Nsets));
     printf("LUB Condition :%.4f dos task sets são escalonáveis\n",((double)1.0*positive2/Nsets));
     printf("LUB Condition :%.4f dos task sets são indeterminados\n",((double)1.0*indetermined/Nsets));
+    printf("RTA Condition :%.4f dos task sets são escalonáveis\n",((double)1.0*rta_counter/Nsets));
     printf("\nUsing All the tasks in the Set\n");
     printf("Number of tasks per Set :%d\n",TaskSetSize);
     printf("Number of Sets :%d\n",Nsets);

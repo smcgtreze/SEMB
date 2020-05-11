@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from matplotlib import pyplot as plt
-from matplotlib import pyplot as plt
 
 plt.style.use("fivethirtyeight")
 
@@ -17,8 +16,10 @@ Sched2 = []
 with open('Dist_Util.csv',newline='') as csv_file:
     csv_reader = csv.reader(csv_file,delimiter=',')
     for row in csv_reader:
-        Util.append(row[0])
-        NTasks.append(row[1])
+        NTasks.append(row[0])
+        Util.append(row[1])
+
+
 
     #language_counter = Counter()
 
@@ -28,14 +29,14 @@ with open('Dist_Util.csv',newline='') as csv_file:
 with open('LUB.csv',newline='') as csv_file:
     csv_reader = csv.reader(csv_file,delimiter=',')
     for row in csv_reader:
-        TasksInSet.append(row[0])  
-        Sched.append(row[1])     
+        Sched.append(row[0])  
+        TasksInSet.append(row[1])     
 
 with open('Hyperbolic.csv',newline='') as csv_file:
     csv_reader = csv.reader(csv_file,delimiter=',')
     for row in csv_reader:
-        TasksInSet2.append(row[0])  
-        Sched2.append(row[1])             
+        Sched2.append(row[0])  
+        TasksInSet2.append(row[1])             
 
 # data = pd.read_csv('data.csv')
 # ids = data['Responder_id']
@@ -69,7 +70,7 @@ plt.yticks(fontsize=11)
 plt.title("Utilization Distribution")
 plt.ylabel("Utilization")
 plt.xlabel("Number of Tasks")
-plt.show()
+
 
 plt.figure(2)
 plt.plot(TasksInSet,Sched)
