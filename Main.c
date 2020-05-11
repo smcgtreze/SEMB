@@ -6,8 +6,10 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-float avg=0.0;
+
+double avg=0.0;
 int count=0;
+
 
 int cmpfunc (const void * a, const void * b) {
    const double *A = a, *B = b;
@@ -19,18 +21,36 @@ int cmpfunc_int (const void * a, const void * b) {
    return (*A > *B) - (*A < *B);
 }
 
-int save(int *histograma,int size){
+int save(char *filename,double ratio,double *vec,int size){
   FILE* file;
-  file= fopen("call.csv","w+");
+  file= fopen(filename,"a+");
+
+  if(file == NULL){
+    printf("Erro a abrir o ficheiro\n");
+  }
+  if(ratio != 0.0){
+    fprintf(file, "%d,%lf\n",TaskSetSize,ratio);
+  }
+
+  if(vec != NULL){
+    for(int i=0;i < size;i++){
+      fprintf(file, "%lf\n",vec[i]);
+    }
+  }
+}
+
+int save_hist(char *filename,int *vec,int size){
+  FILE* file;
+  file= fopen(filename,"w");
 
   if(file == NULL){
     printf("Erro a abrir o ficheiro\n");
   }
 
-  for (int j = 0; j < size; j++)
-  {
-      fprintf(file, "%d, %lf, %d\n", j, (2*j+1)/(float)(size*2), histograma[j]);
-      //printf("%d, %lf, %d\n", j, (2*j+1)/(float)(size*2), histograma[j]);
+  if(vec != NULL){
+    for(int i=0;i < size;i++){
+      fprintf(file, "%lf,%d\n",(double)i*ISize,vec[i]);
+    }
   }
 }
 
@@ -97,6 +117,17 @@ int hyperbolic (int *C,int *T,double *u) {
     }
 }
 
+double average(double *vetor,int size){
+	double soma=0.0;
+	for(int i=0;i < size;i++){
+		soma += vetor[i];
+    // printf("Vetor[%d] =%lf\n",i,vetor[i]);
+    // printf("Soma:%lf\n",soma);
+	}
+	// printf("Soma:%lf\n",soma);
+	return (soma/size);
+}
+
 void Func_init(int task){
     clock_t before = clock();
     for(int i=0;i < 10*CLOCKS_PER_SEC;i++);
@@ -106,46 +137,51 @@ void Func_init(int task){
     count++;
 }
 
-void average(){
-    printf("Average time of execution :%.2f ms\n",avg/count);        
-}
-
 int main (int argc, char *argv[]){
     Sched_Init();
+    int *histograma=malloc(sizeof(int)*(50));
     int *period = malloc(sizeof(int)*10*TaskSetSize),*C=malloc(sizeof(int)*10*TaskSetSize),*deadline = malloc(sizeof(int)*10*TaskSetSize);
     double *util = malloc(sizeof(double)*10*TaskSetSize);
-    int positive =0, positive2 =0;
+    double *aux = malloc(sizeof(double)*10*Nsets);
+    int positive =0, positive2 =0,indetermined = 0;
     srand((unsigned)(time(NULL)));
+    memset(histograma,0,0);
+    memset(aux,0,0);
+    char *str= argv[1];
 
     for(int j=0;j < Nsets;j++){
         TaskSet_New(j);
         //Rate monotonic
-        // for(int i=0;i < TaskSetSize;i++){
-        //     period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-        //     C[i]= 1 + rand()%(5000); // de 1 a 5000
-        // }
-        // qsort(period,TaskSetSize,sizeof(double),cmpfunc);
+        if(strcmp(str,"rm") == 0){
+          for(int i=0;i < TaskSetSize;i++){
+              period[i]= 5001 + rand()%(5000); // de 5001 a 10000
+              C[i]= 1 + rand()%(5000); // de 1 a 5000
+          }
+          qsort(period,TaskSetSize,sizeof(int),cmpfunc);
 
-        // for(int i=0;i < TaskSetSize;i++){
-        //     util[i] =(double) C[i]*1.0/period[i];
-        //     //printf("Utilização %lf\n",util[i]);
-        //     Sched_AddT(Func_init, period[i], period[i],i,C[i]);
-        //     TaskSet_Add(i,j,Tasks[i]);
-        // }
-
-        //Deadline monotonic
-        for(int i=0;i < TaskSetSize;i++){
-            deadline[i]= 10001 + rand()%(5000); // de 10001 a 15000
-            period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-            C[i]= 1 + rand()%(5000); // de 1 a 5000
+          for(int i=0;i < TaskSetSize;i++){
+              util[i] =(double) C[i]*1.0/period[i];
+              //printf("Utilização %lf\n",util[i]);
+              Sched_AddT(Func_init, period[i], period[i],i,C[i]);
+              TaskSet_Add(i,j,Tasks[i]);
+          }
         }
 
-        qsort(deadline,TaskSetSize,sizeof(int),cmpfunc_int);
+        //Deadline monotonic
+        if(strcmp(str,"dm") == 0){
+          for(int i=0;i < TaskSetSize;i++){
+              deadline[i]= 10001 + rand()%(5000); // de 10001 a 15000
+              period[i]= 5001 + rand()%(5000); // de 5001 a 10000
+              C[i]= 1 + rand()%(5000); // de 1 a 5000
+          }
 
-        for(int i=0;i < TaskSetSize;i++){
-            util[i] =(double) C[i]*1.0/period[i];
-            Sched_AddT(Func_init,deadline[i],period[i],i,C[i]);
-            TaskSet_Add(i,j,Tasks[i]);
+          qsort(deadline,TaskSetSize,sizeof(int),cmpfunc);
+
+          for(int i=0;i < TaskSetSize;i++){
+              util[i] =(double) C[i]*1.0/period[i];
+              Sched_AddT(Func_init,deadline[i],period[i],i,C[i]);
+              TaskSet_Add(i,j,Tasks[i]);
+          }
         }
 
         qsort(util,TaskSetSize,sizeof(double),cmpfunc);
@@ -153,40 +189,93 @@ int main (int argc, char *argv[]){
         for(int z=0;z < TaskSetSize-1;z++){
             util[z] = util[z+1] - util[z]; 
         }
-        // printf("Task set id:%d\n",set[j].task[2].id);
 
         //HYPERBOLIC BOUND
-        if(hyperbolic(C,period,util) == 1){
-            printf("\nHyperbolic :Task Set %d is schedulable\n",j);
-            positive++;
+        if(strcmp(str,"dm") == 0){
+          if(hyperbolic(C,deadline,util) == 1){
+              printf("\nHyperbolic :Task Set %d is schedulable\n",j);
+              positive++;
+          }
+
+          else if(hyperbolic(C,deadline,util) == 0){
+              printf("\nHyperbolic :Task Set %d is NOT schedulable\n",j);
+          }
         }
 
-        else if(hyperbolic(C,period,util) == 0){
-            printf("\nHyperbolic :Task Set %d is NOT schedulable\n",j);
-        }
+         if(strcmp(str,"rm") == 0){
+          if(hyperbolic(C,period,util) == 1){
+              printf("\nHyperbolic :Task Set %d is schedulable\n",j);
+              positive++;
+          }
 
+          else if(hyperbolic(C,period,util) == 0){
+              printf("\nHyperbolic :Task Set %d is NOT schedulable\n",j);
+          }
+        }
         //LEAST UPPER BOUND
-        if(leastupperband (util) == 1){
-            printf("LUB :Task Set %d is schedulable\n",j);
-            positive2++;
+        if(strcmp(str,"rm") == 0){
+          if(leastupperband (util) == 1){
+              printf("LUB :Task Set %d is schedulable\n",j);
+              positive2++;
+          }
+
+          else if(leastupperband (util) == 0){
+              printf("LUB :Task Set %d is NOT schedulable\n",j);
+          }
+
+          else{
+              printf("LUB :Task Set %d is indetermined\n",j);
+              ++indetermined;
+          }
         }
 
-        else if(leastupperband (util) == 0){
-            printf("LUB :Task Set %d is NOT schedulable\n",j);
+    //save("Util_avg.csv",0,util,TaskSetSize);
+    //Calculation of the distribution of the utilizations
+    for (int j = 0; j < TaskSetSize;j++){
+      for (int n = 0;n < Bars;n++){
+        if((util[j] >= n*(ISize)) && (util[j] < (n+1)*ISize)){
+          histograma[n]++;
         }
+      }
+    }
+    set[j].avgUtil = average(util,TaskSetSize);
+    printf("Utilization Average :%.4f\n",set[j].avgUtil);
+    // printf("Period Average :%.4f\n",average((double*)period,TaskSetSize));
+    // printf("Deadline Average :%.4f\n",average((double*)deadline,TaskSetSize));
+  }
 
-        else{
-            printf("LUB :Task Set %d is indetermined\n",j);
-        }
+    for (int j = 0; j < Nsets;j++){
+      aux[j] = (double) set[j].avgUtil;
+    }
+
+    if(strcmp(str,"dm") == 0){
+      printf("\nDeadline Monotonic Scheduling ");
+    }
+
+    if(strcmp(str,"rm") == 0){
+      printf("\nRate Monotonic Scheduling ");
     }
 
     printf("\nResultados dos testes \n");
-    printf("Hyperbolic Condition :%.4f dos task sets são escalonáveis\n",((float)1.0*positive/Nsets));
-    printf("LUB Condition :%.4f dos task sets são escalonáveis\n",((float)1.0*positive2/Nsets));
+    printf("Hyperbolic Condition :%.4f dos task sets são escalonáveis\n",((double)1.0*positive/Nsets));
+    printf("LUB Condition :%.4f dos task sets são escalonáveis\n",((double)1.0*positive2/Nsets));
+    printf("LUB Condition :%.4f dos task sets são indeterminados\n",((double)1.0*indetermined/Nsets));
+    printf("\nUsing All the tasks in the Set\n");
+    printf("Number of tasks per Set :%d\n",TaskSetSize);
+    printf("Number of Sets :%d\n",Nsets);
+    printf("Total Average Utilization :%.4lf\n",average(aux,Nsets));
+    // printf("Period Average :%.4f\n",average(period,TaskSetSize*Nsets));
+    // printf("Deadline Average :%.4f\n",average(deadline,TaskSetSize*Nsets));
+
+    // save("Hyperbolic.csv",((double)1.0*positive/Nsets),NULL,0);
+    // save("LUB.csv",(double)(1.0*positive2/Nsets),NULL,0);
+    save_hist("Dist_Util.csv",histograma,Bars);
 
     // while (1) {
     //      Sched_Schedule();
     //      Sched_Dispatch();
     // }
+    free(histograma);
+    free(aux);
 }
 

@@ -3,16 +3,39 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 
 plt.style.use("fivethirtyeight")
 
-with open('info.csv') as csv_file:
-    csv_reader = csv.DictReader(csv_file)
+NTasks = []
+Sched = []
+Util = []
+TasksInSet = []
+TasksInSet2 = []
+Sched2 = []
 
-    language_counter = Counter()
-
+with open('Dist_Util.csv',newline='') as csv_file:
+    csv_reader = csv.reader(csv_file,delimiter=',')
     for row in csv_reader:
-        language_counter.update(row['LanguagesWorkedWith'].split(';'))
+        Util.append(row[0])
+        NTasks.append(row[1])
+
+    #language_counter = Counter()
+
+    # for row in csv_reader:
+        #language_counter.update(row['Number of tasks per task set'].split(';'));
+
+with open('LUB.csv',newline='') as csv_file:
+    csv_reader = csv.reader(csv_file,delimiter=',')
+    for row in csv_reader:
+        TasksInSet.append(row[0])  
+        Sched.append(row[1])     
+
+with open('Hyperbolic.csv',newline='') as csv_file:
+    csv_reader = csv.reader(csv_file,delimiter=',')
+    for row in csv_reader:
+        TasksInSet2.append(row[0])  
+        Sched2.append(row[1])             
 
 # data = pd.read_csv('data.csv')
 # ids = data['Responder_id']
@@ -23,25 +46,43 @@ with open('info.csv') as csv_file:
 # for response in lang_responses:
 #     language_counter.update(response.split(';'))
 
-languages = []
-popularity = []
+# for item in language_counter.most_common(5):
+#     NTasks.append(item[0])
+#     Sched.append(item[1])
 
-for item in language_counter.most_common(5):
-    languages.append(item[0])
-    popularity.append(item[1])
+NTasks.reverse()
+Util.reverse()
+# TasksInSet.reverse()
+# Sched.reverse()
 
-languages.reverse()
-popularity.reverse()
+# print(NTasks)
+# print(Util)
+# print(TasksInSet)
+# print(Sched)
 
-print(languages)
-print(popularity)
+plt.figure(1)
+plt.barh(Util, NTasks)
 
-plt.barh(languages, popularity)
+plt.xticks(fontsize=11)
+plt.yticks(fontsize=11)
 
-plt.title("Most Popular Languages")
-plt.ylabel("Programming Languages")
-plt.xlabel("Number of Users")
+plt.title("Utilization Distribution")
+plt.ylabel("Utilization")
+plt.xlabel("Number of Tasks")
+plt.show()
+
+plt.figure(2)
+plt.plot(TasksInSet,Sched)
+plt.title("Schedulability according to LUB")
+plt.ylabel("Acceptance Ratio")
+plt.xlabel("Number of Tasks per Set")
+
+plt.figure(3)
+plt.plot(TasksInSet2,Sched2)
+plt.title("Schedulability according to HC")
+plt.ylabel("Acceptance Ratio")
+plt.xlabel("Number of Tasks per Set")
+
 
 plt.tight_layout()
-
 plt.show()
