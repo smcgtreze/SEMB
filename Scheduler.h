@@ -1,5 +1,7 @@
 #define TaskSetSize 5
 #define Nsets 1000
+#define Bars 20
+#define ISize 0.050
 
 typedef struct {
 /* period in ticks */
@@ -17,6 +19,7 @@ int id;
 typedef struct {
 Sched_Task_t task[TaskSetSize];
 int id;
+double avgUtil;
 } Task_set;
 
 Sched_Task_t Tasks[TaskSetSize]; //array off structures for all tasks
