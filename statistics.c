@@ -26,6 +26,6 @@ system("touch info.csv");
   
 // fclose(ficheiro);
 
-//system("python plot.py");
-system("python3 plot.py");  
+system("python plot.py");
+//system("python3 plot.py");  
 }

@@ -60,7 +60,8 @@ void Sched_Dispatch(void);
 int Sched_AddT(void (*f)(int),int d, int p,int pri,int wce);
     //adds a task to the schedule
 
+
 void TaskSet_New(int id);
 
-void TaskSet_Add(int taskid,int setid, Sched_Task_t newtask);
 
+void TaskSet_Add(int taskid,int setid, Sched_Task_t newtask);
