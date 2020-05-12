@@ -265,6 +265,9 @@ int main (int argc, char *argv[]){
                 sum+=util[i];
                 period[i]= 5001 + rand()%(5000); // de 5001 a 10000
                 C[i]= util[i]*period[i];
+                if(strcmp(str,"rm") == 0){
+                  deadline[i]=period[i];
+                }
               }
 
               else if((sum > UT*TaskSetSize) && (i <= (TaskSetSize-1))){
@@ -279,13 +282,19 @@ int main (int argc, char *argv[]){
                   sum+=util[i];
                   period[i]= 5001 + rand()%(5000); // de 5001 a 10000
                   C[i]= util[i]*period[i];
+                  if(strcmp(str,"rm") == 0){
+                    deadline[i]=period[i];
+                  }
                 }         
               }
               else{
                   period[i]= 5001 + rand()%(5000); // de 5001 a 10000
                   C[i]= util[i]*period[i];
+                  if(strcmp(str,"rm") == 0){
+                    deadline[i]=period[i];
+                  }
               }
-              Sched_AddT(Func_init, period[i], period[i],i,C[i]);
+              Sched_AddT(Func_init, deadline[i], period[i],i,C[i]);
               TaskSet_Add(i,j,Tasks[i]);
         }
 
