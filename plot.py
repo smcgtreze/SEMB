@@ -52,8 +52,8 @@ with open('Hyperbolic.csv',newline='') as csv_file:
 
 NTasks.reverse()
 Util.reverse()
-# TasksInSet.reverse()
-# Sched.reverse()
+#TasksInSet.reverse()
+Sched.reverse()
 
 # print(NTasks)
 # print(Util)
@@ -69,7 +69,6 @@ plt.yticks(fontsize=11)
 plt.title("Utilization Distribution")
 plt.ylabel("Utilization")
 plt.xlabel("Number of Tasks")
-plt.show()
 
 plt.figure(2)
 plt.plot(TasksInSet,Sched)

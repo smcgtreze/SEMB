@@ -2,6 +2,7 @@
 #define Nsets 1000
 #define Bars 20
 #define ISize 0.050
+#define UT 0.15
 
 typedef struct {
 /* period in ticks */
@@ -58,4 +59,8 @@ void Sched_Dispatch(void);
 
 int Sched_AddT(void (*f)(int),int d, int p,int pri,int wce);
     //adds a task to the schedule
+
+void TaskSet_New(int id);
+
+void TaskSet_Add(int taskid,int setid, Sched_Task_t newtask);
 
