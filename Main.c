@@ -244,8 +244,8 @@ int main (int argc, char *argv[]){
 
           for(int i=0;i < TaskSetSize;i++){
               util[i] =(double) C[i]*1.0/period[i];
-              Sched_AddT(Func_init,deadline[i],period[i],i,C[i]);
-              TaskSet_Add(i,j,Tasks[i]);
+              // Sched_AddT(Func_init,deadline[i],period[i],i,C[i]);
+              // TaskSet_Add(i,j,Tasks[i]);
           }
         }
 
@@ -335,10 +335,10 @@ int main (int argc, char *argv[]){
         }
 
         //RESPONSE TIME ANALYSIS
-        if(strcmp(str,"rm") == 0)
+        if(strcmp(str,"rm") == 0){
           if(responsetimeanalysis(C, period, deadline, TaskSetSize, j)==1)
             rta_counter++;
-
+        }
         if(strcmp(str,"dm") == 0){
           for (int i=0; i<TaskSetSize; i++)
           {
