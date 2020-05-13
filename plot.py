@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 
 plt.style.use("fivethirtyeight")
 
@@ -12,14 +13,14 @@ Util = []
 TasksInSet = []
 TasksInSet2 = []
 Sched2 = []
+TasksInSet3 = []
+Sched3 = []
 
 with open('Dist_Util.csv',newline='') as csv_file:
     csv_reader = csv.reader(csv_file,delimiter=',')
     for row in csv_reader:
-        NTasks.append(row[0])
-        Util.append(row[1])
-
-
+        Util.append(row[0])
+        NTasks.append(row[1])
 
     #language_counter = Counter()
 
@@ -29,14 +30,20 @@ with open('Dist_Util.csv',newline='') as csv_file:
 with open('LUB.csv',newline='') as csv_file:
     csv_reader = csv.reader(csv_file,delimiter=',')
     for row in csv_reader:
-        Sched.append(row[0])  
-        TasksInSet.append(row[1])     
+        TasksInSet.append(row[0])  
+        Sched.append(row[1])     
 
 with open('Hyperbolic.csv',newline='') as csv_file:
     csv_reader = csv.reader(csv_file,delimiter=',')
     for row in csv_reader:
-        Sched2.append(row[0])  
-        TasksInSet2.append(row[1])             
+        TasksInSet2.append(row[0])  
+        Sched2.append(row[1])      
+
+with open('RTA.csv',newline='') as csv_file:
+    csv_reader = csv.reader(csv_file,delimiter=',')
+    for row in csv_reader:
+        TasksInSet3.append(row[0])  
+        Sched3.append(row[1])                
 
 # data = pd.read_csv('data.csv')
 # ids = data['Responder_id']
@@ -54,7 +61,7 @@ with open('Hyperbolic.csv',newline='') as csv_file:
 NTasks.reverse()
 Util.reverse()
 #TasksInSet.reverse()
-Sched.reverse()
+#Sched.reverse()
 
 # print(NTasks)
 # print(Util)
@@ -80,6 +87,12 @@ plt.xlabel("Number of Tasks per Set")
 plt.figure(3)
 plt.plot(TasksInSet2,Sched2)
 plt.title("Schedulability according to HC")
+plt.ylabel("Acceptance Ratio")
+plt.xlabel("Number of Tasks per Set")
+
+plt.figure(4)
+plt.plot(TasksInSet3,Sched3)
+plt.title("Schedulability according to RTA")
 plt.ylabel("Acceptance Ratio")
 plt.xlabel("Number of Tasks per Set")
 

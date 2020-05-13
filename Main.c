@@ -1,5 +1,6 @@
-#include<stdio.h>
-#include"Scheduler.h"
+#include <stdio.h>
+#include "Scheduler.h"
+#include "tests.h"
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -10,6 +11,26 @@
 double avg=0.0;
 int count=0;
 
+double average(double *vetor,int size){
+	double soma=0.0;
+	for(int i=0;i < size;i++){
+		soma += vetor[i];
+    // printf("Vetor[%d] =%lf\n",i,vetor[i]);
+    // printf("Soma:%lf\n",soma);
+	}
+	// printf("Soma:%lf\n",soma);
+	return (soma/size);
+}
+
+void Func_init(int task){
+    clock_t before = clock();
+    for(int i=0;i < 10*CLOCKS_PER_SEC;i++);
+    clock_t difference = clock() - before;
+    printf("Task %d:execution time:%ld ms\n",task,difference*1000/CLOCKS_PER_SEC);
+    avg += difference*1000/CLOCKS_PER_SEC;
+    count++;
+}
+
 
 int cmpfunc (const void * a, const void * b) {
    const double *A = a, *B = b;
@@ -19,6 +40,26 @@ int cmpfunc (const void * a, const void * b) {
 int cmpfunc_int (const void * a, const void * b) {
    const int *A = a, *B = b;
    return (*A > *B) - (*A < *B);
+}
+
+
+void reorder(int *a, int *b, int n) 
+{ 
+  for (int i = 0; i < n; i++)                     //Loop for ascending ordering
+    {
+      for (int j = 0; j < n; j++)             //Loop for comparing other values
+      {
+        if (a[j] > a[i])                //Comparing other array elements
+        {
+          int tmp = a[i];
+          int tmp2 = b[i];      //Using temporary variable for storing last value
+          a[i] = a[j];
+          b[i] = b[j];                        //replacing value
+          a[j] = tmp;
+          b[j] = tmp2;              //storing last value
+        }  
+      }
+    }
 }
 
 int save(char *filename,double ratio,double *vec,int size){
@@ -54,129 +95,6 @@ int save_hist(char *filename,int *vec,int size){
   }
 }
 
-int responsetimeanalysis(int *C,int *T,int *D,int size, int n){
-
-  float RWC1, RWC2=0;
-  int i, j, k;
-
-  for(i=0; i<size; i++){
-
-    RWC1=0;
-    RWC2=0;
-    for(k=0; k<i+1; k++){
-      RWC1 = RWC1+C[k];
-    }
-    //printf("RWC1a = %f\n", RWC1);
-    while(RWC1 != RWC2){
-        if(RWC2 != 0) RWC1 = RWC2;
-      //  printf("RWC1b = %f\n", RWC1);
-      //  printf("RWC2c = %f\n", RWC2);
-        RWC2 = 0;
-        for(j=0; j<i; j++){
-          RWC2 = RWC2+ceil(RWC1/T[j])*C[j];
-        //  printf("RWC2d = %f\n", RWC2);
-        }
-        RWC2 = RWC2 + C[i];
-      //  printf("RWC2e = %f\n", RWC2);
-      //  printf("i = %d\n",i);
-        if(RWC2 > D[i]){
-          printf("RTA: TASK SET %d NOT SCHEDULABLE\n", n);
-          return 0;
-        }
-    }
-  }
-  if(RWC1 == RWC2){
-    printf("RTA: TASK SET %d IS SCHEDULABLE\n", n);
-    return 1;
-  }
-}
-
-int leastupperband (int *C,int *P) {
-  unsigned int i;
-  double result=0.0, up;
-  double *U = malloc(sizeof(double)*10*TaskSetSize);
-
-
-  double length = TaskSetSize;
-//   printf("Length %lf\n",length);
-
-  up = length*(pow(2, 1/length)-1);
-//   printf("up= %f\n", up);
-
-  for(i=0; i < length; i++){
-      U[i] = C[i]*1.0/P[i];
-      result = result + U[i];
-    //  printf("result[%d] = %f\n", i, result);
-  }
-
-  //printf("result= %lf\n", result);
-
-  if(result <= up ){
-    return 1;
-  }
-
-  else if(result > up && result <= 1.0){
-    return -1;
-  }
-
-  else{
-    return 0;
-  }
-}
-
-
-int hyperbolic (int *C,int *T,double *u) {
-
-    unsigned int i=0;
-    double result=1.0, calc=0.0,calc2=0.0;
-
-    // for(i=0; i < TaskSetSize-1; i++){
-    //     calc = (1.0*C[i]/T[i])+1.0;
-    //     printf("calc[%d] = %f\n", i, calc);
-    //     result = result * calc;
-    //     printf("result[%d] = %f\n", i, result);
-    // }
-
-     for(i=0; i < TaskSetSize-1; i++){
-        calc2 = (1.0*u[i])+1.0;
-        //printf("calc2[%d] = %f\n", i, calc2);
-        result = result * calc2;
-        //printf("result[%d] = %f\n", i, result);
-    }
-
-    //printf("result= %f\n", result);
-
-    if(result <=2){
-        //printf("Task Set is schedulable\n");
-        return 1;
-    }
-
-    else{
-        //printf("Task Set NOT schedulable\n");
-        return 0;
-    }
-}
-
-double average(double *vetor,int size){
-	double soma=0.0;
-	for(int i=0;i < size;i++){
-		soma += vetor[i];
-    // printf("Vetor[%d] =%lf\n",i,vetor[i]);
-    // printf("Soma:%lf\n",soma);
-	}
-	// printf("Soma:%lf\n",soma);
-	return (soma/size);
-}
-
-void Func_init(int task){
-    clock_t before = clock();
-    for(int i=0;i < 10*CLOCKS_PER_SEC;i++);
-    clock_t difference = clock() - before;
-    printf("Task %d:execution time:%ld ms\n",task,difference*1000/CLOCKS_PER_SEC);
-    avg += difference*1000/CLOCKS_PER_SEC;
-    count++;
-}
-
 int main (int argc, char *argv[]){
     Sched_Init();
     int *histograma=malloc(sizeof(int)*(50));
@@ -185,6 +103,7 @@ int main (int argc, char *argv[]){
     double *aux = malloc(sizeof(double)*10*Nsets);
     double sum=0.0;
     int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0;
+    int RandSize = UT*10000;
     srand((unsigned)(time(NULL)));
     memset(histograma,0,0);
     memset(aux,0,0);
@@ -195,57 +114,29 @@ int main (int argc, char *argv[]){
         //Rate monotonic
         if(strcmp(str,"rm") == 0){
           for(int i=0;i < TaskSetSize;i++){
-              period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-              C[i]= 1 + rand()%(5000); // de 1 a 5000
+              period[i] = 2*(1+rand()%(MAXPERIOD)); // Ti evenly divides Ti+1 
+              C[i]= rand()%(period[i]) ; // the computation time C i uniform in [0,Ti ]
           }
-          qsort(period,TaskSetSize,sizeof(int),cmpfunc);
-          sum=0.0;
+          qsort(period,TaskSetSize,sizeof(int),cmpfunc_int);
 
           for(int i=0;i < TaskSetSize;i++){
               util[i] =(double) C[i]*1.0/period[i];
-              // sum+=util[i];
-
-              // if((sum < UT*TaskSetSize) && (i == (TaskSetSize-1))){
-              //   sum=sum-util[i];
-              //   util[i] = (UT*TaskSetSize - sum);
-              //   sum+=util[i];
-              // }
-
-              // else if((sum > UT*TaskSetSize) && (i <= (TaskSetSize-1))){
-              //   sum=sum-util[i];
-              //   util[i] = (UT*TaskSetSize - sum)/(TaskSetSize - i);
-              //   sum+=util[i];
-                
-              //   while(i < TaskSetSize -1){
-              //     ++i;
-              //     util[i]=util[i-1];
-              //     // printf("Utilização %lf\n",util[i]);
-              //     sum+=util[i];
-              //     period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-              //     C[i]= util[i]*period[i];
-              //   }         
-              // }
-              // Sched_AddT(Func_init, period[i], period[i],i,C[i]);
-              // TaskSet_Add(i,j,Tasks[i]);
           }
-          // printf("Soma das utilizações depois %lf\n",sum);
         }
         
 
         //Deadline monotonic
         if(strcmp(str,"dm") == 0){
           for(int i=0;i < TaskSetSize;i++){
-              deadline[i]= 10001 + rand()%(5000); // de 10001 a 15000
-              period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-              C[i]= 1 + rand()%(5000); // de 1 a 5000
+              period[i]= 2*(1+rand()%(MAXPERIOD)); 
+              deadline[i]= rand()%(period[i]); // D > P
+              C[i]= rand()%(period[i]); 
           }
 
-          qsort(deadline,TaskSetSize,sizeof(int),cmpfunc);
+          qsort(deadline,TaskSetSize,sizeof(int),cmpfunc_int);
 
           for(int i=0;i < TaskSetSize;i++){
               util[i] =(double) C[i]*1.0/period[i];
-              // Sched_AddT(Func_init,deadline[i],period[i],i,C[i]);
-              // TaskSet_Add(i,j,Tasks[i]);
           }
         }
 
@@ -263,10 +154,9 @@ int main (int argc, char *argv[]){
                 sum=sum-util[i];
                 util[i] = (UT*TaskSetSize - sum);
                 sum+=util[i];
-                period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-                C[i]= util[i]*period[i];
-                if(strcmp(str,"rm") == 0){
-                  deadline[i]=period[i];
+                period[i]= 2*(1+rand()%(MAXPERIOD)); 
+                if(strcmp(str,"dm") == 0){
+                  deadline[i]= rand()%(period[i]); // D > P
                 }
               }
 
@@ -274,32 +164,47 @@ int main (int argc, char *argv[]){
                 sum=sum-util[i];
                 util[i] = (UT*TaskSetSize - sum)/(TaskSetSize - i);
                 sum+=util[i];
+                period[i]= 2*(1+rand()%(MAXPERIOD));
+                if(strcmp(str,"dm") == 0){
+                  deadline[i]= rand()%(period[i]); // D > P
+                } 
                 
                 while(i < TaskSetSize -1){
                   ++i;
                   util[i]=util[i-1];
-                  // printf("Utilização %lf\n",util[i]);
                   sum+=util[i];
-                  period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-                  C[i]= util[i]*period[i];
-                  if(strcmp(str,"rm") == 0){
-                    deadline[i]=period[i];
-                  }
+                  period[i]= 2*(1+rand()%(MAXPERIOD));
+                  if(strcmp(str,"dm") == 0){
+                    deadline[i]= rand()%(period[i]); // D > P
+                  } 
                 }         
               }
               else{
-                  period[i]= 5001 + rand()%(5000); // de 5001 a 10000
-                  C[i]= util[i]*period[i];
-                  if(strcmp(str,"rm") == 0){
-                    deadline[i]=period[i];
-                  }
+                  period[i]= 1+ 2*(rand()%(MAXPERIOD));
+                  if(strcmp(str,"dm") == 0){
+                    deadline[i]= rand()%(period[i]); // D > P
+                  } 
               }
-              Sched_AddT(Func_init, deadline[i], period[i],i,C[i]);
-              TaskSet_Add(i,j,Tasks[i]);
         }
+      
+      if(strcmp(str,"rm") == 0)
+      {qsort(period,TaskSetSize,sizeof(int),cmpfunc_int);}
+      if(strcmp(str,"dm") == 0){
+        //qsort(deadline,TaskSetSize,sizeof(int),cmpfunc_int);
+        reorder(deadline,period,TaskSetSize);
+      } 
+
+      for(int i=0;i < TaskSetSize;i++){
+            C[i]= util[i]*period[i];
+            if(strcmp(str,"rm") == 0){
+              deadline[i]=period[i];
+            }
+            Sched_AddT(Func_init, deadline[i], period[i],i,C[i]);
+            TaskSet_Add(i,j,Tasks[i]);                     
+      }
 
         //HYPERBOLIC BOUND (rm Utilization)
-         if(strcmp(str,"rm") == 0){
+        if(strcmp(str,"rm") == 0){
           if(hyperbolic(C,period,util) == 1){
               printf("\nHyperbolic :Task Set %d is schedulable\n",j);
               positive++;
@@ -351,7 +256,7 @@ int main (int argc, char *argv[]){
         if(strcmp(str,"dm") == 0){
           for (int i=0; i<TaskSetSize; i++)
           {
-            if(deadline[i]>=period[i])
+            if(deadline[i]<=period[i])
             {
               counter++;
             }
@@ -367,11 +272,16 @@ int main (int argc, char *argv[]){
             counter = 0;
         }
 
-    //save("Util_avg.csv",0,util,TaskSetSize);
     //Calculation of the distribution of the utilizations
-    for (int j = 0; j < TaskSetSize;j++){
+    for (int z = 0; z < TaskSetSize;z++){
+        printf("\nSet %d/%d\n",j,Nsets-1);
+        printf("Task %d/%d\n",z,TaskSetSize-1);
+        printf("Period %d\n",period[z]);
+        printf("Execution time %d\n",C[z]);
+        printf("Deadline %d\n",deadline[z]);
+        printf("Utilization %lf\n",util[z]);
       for (int n = 0;n < Bars;n++){
-        if((util[j] >= n*(ISize)) && (util[j] < (n+1)*ISize)){
+        if((util[z] >= n*(ISize)) && (util[z] < (n+1)*ISize)){
           histograma[n]++;
         }
       }
@@ -379,7 +289,7 @@ int main (int argc, char *argv[]){
 
     //Average of each task set
     set[j].avgUtil = average(util,TaskSetSize);
-    printf("Utilization Average :%.4f\n",set[j].avgUtil);
+    // printf("Utilization Average :%.4f\n",set[j].avgUtil);
     // printf("Period Average :%.4f\n",average((double*)period,TaskSetSize));
     // printf("Deadline Average :%.4f\n",average((double*)deadline,TaskSetSize));
   }
@@ -410,13 +320,18 @@ int main (int argc, char *argv[]){
 
     // save("Hyperbolic.csv",((double)1.0*positive/Nsets),NULL,0);
     // save("LUB.csv",(double)(1.0*positive2/Nsets),NULL,0);
+    // save("RTA.csv",(double)(1.0*rta_counter/Nsets),NULL,0);
     save_hist("Dist_Util.csv",histograma,Bars);
+
     // while (1) {
     //      Sched_Schedule();
     //      Sched_Dispatch();
     // }
 
     free(histograma);
+    free(C);
+    free(period);
+    free(deadline);
+    free(util);
     free(aux);
 }
-
