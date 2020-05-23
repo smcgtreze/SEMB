@@ -3,7 +3,8 @@
 #define Bars 20
 #define ISize 0.050
 #define UT_int 0.05
-#define MAXPERIOD 5000
+#define MAXPERIOD 500
+#define MAXN 12
 
  /*task periods are more
 deterministic, since are defined by the user and then enforced by the operating system
@@ -28,6 +29,9 @@ typedef struct {
 Sched_Task_t task[MaxTaskSetSize];
 int id;
 double avgUtil;
+double avgPeriod;
+double avgDeadline;
+double avgExecutingtime;
 } Task_set;
 
 Sched_Task_t Tasks[MaxTaskSetSize]; //array off structures for all tasks
@@ -74,3 +78,4 @@ int Sched_AddT(void (*f)(int),int d, int p,int pri,int wce);
 void TaskSet_New(int id);
 
 void TaskSet_Add(int taskid,int setid, Sched_Task_t newtask);
+

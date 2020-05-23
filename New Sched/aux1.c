@@ -17,7 +17,16 @@ double average(double *vetor,int size){
     // printf("Vetor[%d] =%lf\n",i,vetor[i]);
     // printf("Soma:%lf\n",soma);
 	}
-	// printf("Soma:%lf\n",soma);
+	return (soma/size);
+}
+
+double average_int(int *vetor,int size){
+	double soma=0.0;
+	for(int i=0;i < size;i++){
+		soma += vetor[i];
+    // printf("Vetor[%d] =%lf\n",i,vetor[i]);
+    // printf("Soma:%lf\n",soma);
+	}
 	return (soma/size);
 }
 

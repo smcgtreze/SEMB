@@ -8,41 +8,45 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdbool.h>
 
 int main (int argc, char *argv[]){
   char var[20];
   double UT_aux;
   int TSS=0;
-  printf("Escolha uma variável para manter constante UT ou TSS (Task Set Size) \n");
-  scanf("%s",&var);
-  if(strcmp(var,"UT") == 0){
-    printf("Escolha um valor para UT \n");
-    scanf("%lf",&UT_aux);
-    UT_MIN=UT_aux; // Limite inferior da Utilização média de cada task set
-    UT_MAX=UT_aux; // Limite superior da Utilização média de cada task set
-    printf("Escolha o valor para TSS max \n");
-    scanf("%d",&TSS);
-    TaskSetSize=TSS; // Limite superior do Task Set Size
-    printf("Escolha o valor para TSS min \n");
-    scanf("%d",&TSS);
-    SetSizeMin =TSS; // Limite inferior do Task Set Size
-  }
-  if(strcmp(var,"TSS") == 0){
-    printf("Escolha o valor para UT max \n");
-    scanf("%lf",&UT_aux);
-    UT_MAX=UT_aux; // Limite superior da Utilização média de cada task set
-    printf("Escolha o valor para UT min \n");
-    scanf("%lf",&UT_aux);
-    UT_MIN=UT_aux; // Limite inferior da Utilização média de cada task set
-    printf("Escolha um valor para TSS \n");
-    scanf("%d",&TSS);
-    TaskSetSize=TSS; // Limite superior do Task Set Size
-    SetSizeMin =TSS; // Limite inferior do Task Set Size
-  }
-  // TaskSetSize=5; // Limite superior do Task Set Size
-  // SetSizeMin =5; // Limite inferior do Task Set Size
-  // UT_MIN=0.05; // Limite inferior da Utilização média de cada task set
-  // UT_MAX=0.50; // Limite superior da Utilização média de cada task set
+  bool harmonic;
+  // printf("Escolha uma variável para manter constante UT ou TSS (Task Set Size) \n");
+  // scanf("%s",&var);
+  // if(strcmp(var,"UT") == 0){
+  //   printf("Escolha um valor para UT \n");
+  //   scanf("%lf",&UT_aux);
+  //   UT_MIN=UT_aux; // Limite inferior da Utilização média de cada task set
+  //   UT_MAX=UT_aux; // Limite superior da Utilização média de cada task set
+  //   printf("Escolha o valor para TSS max \n");
+  //   scanf("%d",&TSS);
+  //   TaskSetSize=TSS; // Limite superior do Task Set Size
+  //   printf("Escolha o valor para TSS min \n");
+  //   scanf("%d",&TSS);
+  //   SetSizeMin =TSS; // Limite inferior do Task Set Size
+  // }
+  // if(strcmp(var,"TSS") == 0){
+  //   printf("Escolha o valor para UT max \n");
+  //   scanf("%lf",&UT_aux);
+  //   UT_MAX=UT_aux; // Limite superior da Utilização média de cada task set
+  //   printf("Escolha o valor para UT min \n");
+  //   scanf("%lf",&UT_aux);
+  //   UT_MIN=UT_aux; // Limite inferior da Utilização média de cada task set
+  //   printf("Escolha um valor para TSS \n");
+  //   scanf("%d",&TSS);
+  //   TaskSetSize=TSS; // Limite superior do Task Set Size
+  //   SetSizeMin =TSS; // Limite inferior do Task Set Size
+  // }
+  strcpy(var,"TSS");
+  harmonic=true;
+  TaskSetSize=3; // Limite superior do Task Set Size
+  SetSizeMin =3; // Limite inferior do Task Set Size
+  UT_MIN=0.05; // Limite inferior da Utilização média de cada task set
+  UT_MAX=0.50; // Limite superior da Utilização média de cada task set
   remove("Hyperbolic.csv"); //remover os ficheiros resultantes da última execução
   remove("LUB.csv");
   remove("RTA.csv");   
@@ -54,12 +58,18 @@ int main (int argc, char *argv[]){
     int *period = malloc(sizeof(int)*10*t),*C=malloc(sizeof(int)*10*t),*deadline = malloc(sizeof(int)*10*t);
     double *util = malloc(sizeof(double)*10*t);
     double *aux = malloc(sizeof(double)*10*Nsets);
+    double *aux1 = malloc(sizeof(double)*10*Nsets);
+    double *aux2 = malloc(sizeof(double)*10*Nsets);
+    double *aux3 = malloc(sizeof(double)*10*Nsets);
     double sum=0.0;
     int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0;
     int RandSize = UT*10000;
     srand((unsigned)(time(NULL)));
     memset(histograma,0,0);
     memset(aux,0,0);
+    memset(aux1,0,0);
+    memset(aux2,0,0);
+    memset(aux3,0,0);
     memset(C,0,0);
     memset(deadline,0,0);
     memset(util,0,0);
@@ -71,7 +81,9 @@ int main (int argc, char *argv[]){
         //Rate monotonic
         if(strcmp(str,"rm") == 0){
           for(int i=0;i < t;i++){
-              period[i] = 2*(1+rand()%(MAXPERIOD)); // Ti evenly divides Ti+1 
+              // period[i] = 2*(1+rand()%(MAXPERIOD)); // Ti evenly divides Ti+1
+              if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+              else{period[i]= 2*(1+rand()%(MAXPERIOD));}
               C[i]= rand()%(period[i]) ; // the computation time C i uniform in [0,Ti ]
           }
           qsort(period,t,sizeof(int),cmpfunc_int);
@@ -85,7 +97,9 @@ int main (int argc, char *argv[]){
         //Deadline monotonic
         if(strcmp(str,"dm") == 0){
           for(int i=0;i < t;i++){
-              period[i]= 2*(1+rand()%(MAXPERIOD)); 
+              // period[i]= 2*(1+rand()%(MAXPERIOD)); 
+              if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+              else{period[i]= 2*(1+rand()%(MAXPERIOD));}
               deadline[i]= rand()%(period[i]); // D > P
               C[i]= rand()%(period[i]); 
           }
@@ -111,7 +125,9 @@ int main (int argc, char *argv[]){
                 sum=sum-util[i];
                 util[i] = (UT*t - sum);
                 sum+=util[i];
-                period[i]= 2*(1+rand()%(MAXPERIOD)); 
+                // period[i]= 2*(1+rand()%(MAXPERIOD)); 
+                if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+                else{period[i]= 2*(1+rand()%(MAXPERIOD));}
                 if(strcmp(str,"dm") == 0){
                   deadline[i]= rand()%(period[i]); // D > P
                 }
@@ -121,7 +137,9 @@ int main (int argc, char *argv[]){
                 sum=sum-util[i];
                 util[i] = (UT*t - sum)/(t - i);
                 sum+=util[i];
-                period[i]= 2*(1+rand()%(MAXPERIOD));
+                // period[i]= 2*(1+rand()%(MAXPERIOD));
+                if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+                else{period[i]= 2*(1+rand()%(MAXPERIOD));}
                 if(strcmp(str,"dm") == 0){
                   deadline[i]= rand()%(period[i]); // D > P
                 } 
@@ -130,14 +148,16 @@ int main (int argc, char *argv[]){
                   ++i;
                   util[i]=util[i-1];
                   sum+=util[i];
-                  period[i]= 2*(1+rand()%(MAXPERIOD));
+                  if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+                  else{period[i]= 2*(1+rand()%(MAXPERIOD));}
                   if(strcmp(str,"dm") == 0){
                     deadline[i]= rand()%(period[i]); // D > P
                   } 
                 }         
               }
               else{
-                  period[i]= 1+ 2*(rand()%(MAXPERIOD));
+                  // period[i]= 1+ 2*(rand()%(MAXPERIOD));
+                  if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                   if(strcmp(str,"dm") == 0){
                     deadline[i]= rand()%(period[i]); // D > P
                   } 
@@ -246,14 +266,20 @@ int main (int argc, char *argv[]){
 
     //Average of each task set
     set[j].avgUtil = average(util,t);
+    set[j].avgPeriod = average_int(period,t);
+    set[j].avgDeadline = average_int(deadline,t);
+    set[j].avgExecutingtime = average_int(C,t);
     // printf("Utilization Average :%.4f\n",set[j].avgUtil);
-    // printf("Period Average :%.4f\n",average((double*)period,t));
-    // printf("Deadline Average :%.4f\n",average((double*)deadline,t));
+    // printf("Period Average :%.2f\n",average_int(period,t));
+    // printf("Deadline Average :%.2f\n",average_int(deadline,t));
    }
   
 
     for (int j = 0; j < Nsets;j++){
       aux[j] = (double) set[j].avgUtil;
+      aux1[j] = (double) set[j].avgPeriod;
+      aux2[j] = (double) set[j].avgDeadline;
+      aux3[j] = (double) set[j].avgExecutingtime;
     }
 
     if(strcmp(str,"dm") == 0){
@@ -273,8 +299,9 @@ int main (int argc, char *argv[]){
     printf("Number of tasks per Set :%d\n",t);
     printf("Number of Sets :%d\n",Nsets);
     printf("Total Average Utilization :%.4lf\n",average(aux,Nsets));
-    // printf("Period Average :%.4f\n",average(period,t*Nsets));
-    // printf("Deadline Average :%.4f\n",average(deadline,t*Nsets));
+    printf("Total Period Average :%.4f\n",average(aux1,Nsets));
+    printf("Total Deadline Average :%.4f\n",average(aux2,Nsets));
+    printf("Total Execution time Average :%.4f\n",average(aux3,Nsets));
 
     save("Hyperbolic.csv",((double)1.0*positive/Nsets),0,t,UT,var);
     save("LUB.csv",(double)(1.0*positive2/Nsets),0,t,UT,var);
@@ -288,6 +315,9 @@ int main (int argc, char *argv[]){
     free(deadline);
     free(util);
     free(aux);
+    free(aux1);
+    free(aux2);
+    free(aux3);
   }
   }
   
