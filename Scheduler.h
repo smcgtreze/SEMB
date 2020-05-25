@@ -25,16 +25,16 @@ int id;
 } Sched_Task_t;
 
 typedef struct {
-Sched_Task_t task[TaskSetSize];
-int id;
-double avgUtil;
+    Sched_Task_t task[TaskSetSize];
+    int id;
+    double avgUtil;
 } Task_set;
 
 Sched_Task_t Tasks[TaskSetSize]; //array off structures for all tasks
 Task_set set[Nsets];
 // int cur_task = 20; // 0-> High 19->Low
 
-int Sched_Init(void);
+void Sched_Init(void);
 /* - Initialise data
 * structures.
 *

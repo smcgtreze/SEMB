@@ -1,5 +1,5 @@
-#define MaxTaskSetSize 20
-#define Nsets 1000
+#define MaxTaskSetSize 3
+#define Nsets 10
 #define Bars 20
 #define ISize 0.050
 #define UT_int 0.05
@@ -42,7 +42,7 @@ double UT_MAX;
 double UT_MIN;
 // int cur_task = 20; // 0-> High 19->Low
 
-int Sched_Init(int TaskSetSize);
+void Sched_Init(int TaskSetSize);
 /* - Initialise data
 * structures.
 *

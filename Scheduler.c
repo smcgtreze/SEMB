@@ -6,7 +6,7 @@
 
 int cur_task = TaskSetSize; // 0-> High 19->Low
 
-int Sched_Init(void){
+void Sched_Init(void){
     for(int x=0; x<TaskSetSize; x++)
         Tasks[x].func = 0;
      int i;

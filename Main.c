@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "Scheduler.h"
 #include "tests.h"
+#include "PIP.h"
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -62,7 +63,7 @@ void reorder(int *a, int *b, int n)
     }
 }
 
-int save(char *filename,double ratio,double *vec,int size){
+void save(char *filename,double ratio,double *vec,int size){
   FILE* file;
   file= fopen(filename,"a+");
 
@@ -80,7 +81,7 @@ int save(char *filename,double ratio,double *vec,int size){
   }
 }
 
-int save_hist(char *filename,int *vec,int size){
+void save_hist(char *filename,int *vec,int size){
   FILE* file;
   file= fopen(filename,"w");
 
@@ -102,7 +103,8 @@ int main (int argc, char *argv[]){
     double *util = malloc(sizeof(double)*10*TaskSetSize);
     double *aux = malloc(sizeof(double)*10*Nsets);
     double sum=0.0;
-    int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0;
+    int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0, rows, n_sem;
+    int *B;
     int RandSize = UT*10000;
     srand((unsigned)(time(NULL)));
     memset(histograma,0,0);
@@ -272,6 +274,19 @@ int main (int argc, char *argv[]){
             counter = 0;
         }
 
+        rows= TaskSetSize;
+
+        n_sem = rand() % (rows-1) + 1;
+
+
+        B = (int *)malloc(rows * sizeof(int));
+
+
+
+        printf("\n\n------------------------------------\n");
+
+        B = calc_b(period, rows, n_sem);
+
     //Calculation of the distribution of the utilizations
     for (int z = 0; z < TaskSetSize;z++){
         printf("\nSet %d/%d\n",j,Nsets-1);
@@ -280,6 +295,7 @@ int main (int argc, char *argv[]){
         printf("Execution time %d\n",C[z]);
         printf("Deadline %d\n",deadline[z]);
         printf("Utilization %lf\n",util[z]);
+        printf("B %d\n",B[z]);
       for (int n = 0;n < Bars;n++){
         if((util[z] >= n*(ISize)) && (util[z] < (n+1)*ISize)){
           histograma[n]++;

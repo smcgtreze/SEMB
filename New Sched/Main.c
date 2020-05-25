@@ -2,6 +2,7 @@
 #include "Scheduler.h"
 #include "aux1.h"
 #include "tests.h"
+#include "PIP.h"
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -54,6 +55,7 @@ int main (int argc, char *argv[]){
   for(double UT=UT_MIN;UT <= UT_MAX;UT+= UT_int){
   for(int t=SetSizeMin;t < TaskSetSize+1;t++){
     Sched_Init(t);
+    int *B;
     int *histograma=malloc(sizeof(int)*(50));
     int *period = malloc(sizeof(int)*10*t),*C=malloc(sizeof(int)*10*t),*deadline = malloc(sizeof(int)*10*t);
     double *util = malloc(sizeof(double)*10*t);
@@ -62,7 +64,7 @@ int main (int argc, char *argv[]){
     double *aux2 = malloc(sizeof(double)*10*Nsets);
     double *aux3 = malloc(sizeof(double)*10*Nsets);
     double sum=0.0;
-    int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0;
+    int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0, rows, i, n_sem;
     int RandSize = UT*10000;
     srand((unsigned)(time(NULL)));
     memset(histograma,0,0);
@@ -249,14 +251,29 @@ int main (int argc, char *argv[]){
             counter = 0;
         }
 
+        rows= t;
+
+        n_sem = rand() % (rows-1) + 1;
+
+
+        B = (int *)malloc(rows * sizeof(int));
+
+
+
+        printf("\n\n------------------------------------\n");
+
+        B = calc_b(period, rows, n_sem);
+
+
     //Calculation of the distribution of the utilizations
     for (int z = 0; z < t;z++){
-        // printf("\nSet %d/%d\n",j,Nsets-1);
-        // printf("Task %d/%d\n",z,t-1);
-        // printf("Period %d\n",period[z]);
-        // printf("Execution time %d\n",C[z]);
-        // printf("Deadline %d\n",deadline[z]);
-        // printf("Utilization %lf\n",util[z]);
+         printf("\nSet %d/%d\n",j,Nsets-1);
+         printf("Task %d/%d\n",z,t-1);
+         printf("Period %d\n",period[z]);
+         printf("Execution time %d\n",C[z]);
+         printf("Deadline %d\n",deadline[z]);
+         printf("Utilization %lf\n",util[z]);
+         printf("B %d\n",B[z]);
       for (int n = 0;n < Bars;n++){
         if((util[z] >= n*(ISize)) && (util[z] < (n+1)*ISize)){
           histograma[n]++;
