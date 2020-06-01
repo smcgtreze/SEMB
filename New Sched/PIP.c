@@ -3,6 +3,7 @@
 #include "Scheduler.h"
 #include <time.h>
 #define Max_period 10000
+FILE* file;
 
 
 int min(int a, int b){
@@ -39,7 +40,7 @@ void gen_cri_sen(int * set, int rows, int sem, int cri_sen[rows][sem]){
 
     int i, j, pos, zeros, periodo, posx, posy, num_r;
 
-    srand(time(NULL));
+    // srand((unsigned)(time(NULL)*(unsigned int)(rows))); 
 
     for(i=0;i<rows;i++){
 
@@ -130,8 +131,14 @@ int * calc_b(int * set, int n_tasks, int n_sem){
     int i = 0, k = 0, j, D_max;
     int *Bl, *Bs, *C_sem, *B;
     int cri_sec[n_tasks][n_sem];
-
-    srand(time(NULL));
+    char filename[30] = "Priority Inheritances.txt"; 
+    if(file == NULL){
+        file= fopen(filename,"a+");
+    }
+    if(file == NULL){
+        printf("Erro a abrir o ficheiro\n");
+    }
+    // srand((unsigned)(time(NULL)*(unsigned int)(n_tasks))); 
 
     B = malloc(sizeof(int)*n_tasks);
     Bl = malloc(sizeof(int)*n_tasks);
@@ -142,40 +149,40 @@ int * calc_b(int * set, int n_tasks, int n_sem){
     
     gen_cri_sen(set, n_tasks, n_sem, cri_sec);
 
-    printf("\n   PRIORITY INHERITANCE PROTOCOL\n\n");
+    fprintf(file,"\n   PRIORITY INHERITANCE PROTOCOL\n\n");
 
-    printf("\n Critical Sections Matrix:\n  ");
+    fprintf(file,"\n Critical Sections Matrix:\n  ");
 
     for(k=0;k<n_sem;k++)
-        printf(" S%d", k+1);
-    printf("\n");
+        fprintf(file," S%d", k+1);
+    fprintf(file,"\n");
 
     for(i=0;i<n_tasks;i++){
-        printf("T%d ", i+1);
+        fprintf(file,"T%d ", i+1);
         for(k=0;k<n_sem;k++)
-            printf(" %d ", cri_sec[i][k]);
+            fprintf(file," %d ", cri_sec[i][k]);
 
-        printf("\n");
+        fprintf(file,"\n");
     }
 
-    printf("\n");
+    fprintf(file,"\n");
 
 
     C_sem = gen_ceil(n_tasks, n_sem, cri_sec);
 
-    printf("\nSemaphores Ceiling: ");
+    fprintf(file,"\nSemaphores Ceiling: ");
 
-    printf("\n");
-
-    for(i=0;i<n_sem;i++)
-        printf("S%d ", i+1);
-
-    printf("\n");
+    fprintf(file,"\n");
 
     for(i=0;i<n_sem;i++)
-        printf("P%d ", (C_sem[i]+1));
+        fprintf(file,"S%d ", i+1);
 
-    printf("\n\n");
+    fprintf(file,"\n");
+
+    for(i=0;i<n_sem;i++)
+        fprintf(file,"P%d ", (C_sem[i]+1));
+
+    fprintf(file,"\n\n");
 
 
     for (i=0;i<(n_tasks-1);i++){

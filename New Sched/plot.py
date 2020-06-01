@@ -60,8 +60,8 @@ with open('RTA.csv',newline='') as csv_file:
 
 NTasks.reverse()
 Util.reverse()
-#TasksInSet.reverse()
-#Sched.reverse()
+TasksInSet.reverse()
+Sched.reverse()
 
 # print(NTasks)
 # print(Util)
