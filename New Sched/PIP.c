@@ -126,15 +126,15 @@ int* gen_ceil(int rows, int columns, int cri_sen[rows][columns]){
 }
 
 
-int * calc_b(int * set, int n_tasks, int n_sem){
+int * calc_b(int * set, int n_tasks, int n_sem, int taskset_id, double TAU){
     
     int i = 0, k = 0, j, D_max;
     int *Bl, *Bs, *C_sem, *B;
     int cri_sec[n_tasks][n_sem];
     char filename[30] = "Priority Inheritances.txt"; 
-    if(file == NULL){
-        file= fopen(filename,"a+");
-    }
+    
+    file = fopen(filename,"a+");
+    
     if(file == NULL){
         printf("Erro a abrir o ficheiro\n");
     }
@@ -149,9 +149,13 @@ int * calc_b(int * set, int n_tasks, int n_sem){
     
     gen_cri_sen(set, n_tasks, n_sem, cri_sec);
 
-    fprintf(file,"\n   PRIORITY INHERITANCE PROTOCOL\n\n");
+    fprintf(file,"\n\n   PRIORITY INHERITANCE PROTOCOL\n\n");
 
-    fprintf(file,"\n Critical Sections Matrix:\n  ");
+    fprintf(file,"\n Taskset: %d \n", taskset_id);
+
+    fprintf(file,"\n Total Average Utilization: %lf \n", TAU);
+
+    fprintf(file,"\n\n Critical Sections Matrix:\n  ");
 
     for(k=0;k<n_sem;k++)
         fprintf(file," S%d", k+1);
@@ -182,7 +186,7 @@ int * calc_b(int * set, int n_tasks, int n_sem){
     for(i=0;i<n_sem;i++)
         fprintf(file,"P%d ", (C_sem[i]+1));
 
-    fprintf(file,"\n\n");
+    fprintf(file,"\n");
 
 
     for (i=0;i<(n_tasks-1);i++){
@@ -223,6 +227,14 @@ int * calc_b(int * set, int n_tasks, int n_sem){
     }
 
     B[n_tasks-1] = 0;
+
+    
+    for(i=0;i<n_tasks;i++)
+        fprintf(file,"\nB%d : %d", i, B[i]);
+    
+    fprintf(file,"\n\n\n\n");
+
+    fclose(file);
 
     return B;
 }

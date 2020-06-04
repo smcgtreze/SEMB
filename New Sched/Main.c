@@ -263,17 +263,17 @@ int main (int argc, char *argv[]){
             counter = 0;
         }
 
-
         //Priority Inheritance Study
         rows= t;
+
+        B = malloc(sizeof(int)*rows);
+
         if(rows > 1){
           n_sem = rand() % (rows-1) + 1;
 
-          B = (int *)malloc(rows * sizeof(int));
-
           // printf("\n\n------------------------------------\n");
 
-          B = calc_b(period, rows, n_sem);
+          B = calc_b(period, rows, n_sem, j, UT);
         }
 
     //Calculation of the distribution of the utilizations
@@ -353,5 +353,4 @@ int main (int argc, char *argv[]){
     //      Sched_Schedule(TaskSetSize);
     //      Sched_Dispatch();
     // }
-
 }
