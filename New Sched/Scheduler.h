@@ -1,5 +1,5 @@
 #define MaxTaskSetSize 50
-#define Nsets 10000
+#define Nsets 100000
 #define Bars 20
 #define ISize 0.050
 #define UT_int 0.01
@@ -13,16 +13,10 @@ knowledge about the environment where it is going to be used, assuming some prob
 density for the period is something we cannot avoid.*/
 
 typedef struct {
-/* period in ticks */
-int period;
-/* ticks until next activation */
-int delay;
-/* function pointer */
-void (*func)(int);
-/* activation counter */
-int exec;
-int wce;
-int id;
+int period; // period of the task
+int exec; // execution time of the task
+int deadline; // deadline of the task
+int id; // id of the task
 } Sched_Task_t;
 
 typedef struct {
@@ -47,10 +41,6 @@ void Sched_Init(int TaskSetSize);
 /* - Initialise data
 * structures.
 *
-* - Configure interrupt
-* that periodically
-* calls int_handler()
-* Sched_Schedule().
 */
 
 void Sched_Schedule(int TaskSetSize);
@@ -73,10 +63,13 @@ void Sched_Dispatch(void);
 * task.
 */
 
-int Sched_AddT(void (*f)(int),int d, int p,int pri,int wce);
-    //adds a task to the schedule
+int Sched_AddT(int d, int p,int pri,int wce);
+    /*adds a task 
+    to the schedule*/
 
 void TaskSet_New(int id);
+/* creats a new task set*/
 
 void TaskSet_Add(int taskid,int setid, Sched_Task_t newtask);
+/* adds a task that that task set */
 

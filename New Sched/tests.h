@@ -1,4 +1,5 @@
-int responsetimeanalysis(int *C,int *T,int *D,int size, int n);
+#include <stdbool.h>
+int responsetimeanalysis(int *C,int *T,int *D,int size, int n,bool block,int *B);
 
 int leastupperband (int *C,int *P,int t);
 

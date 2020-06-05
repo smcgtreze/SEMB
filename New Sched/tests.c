@@ -6,8 +6,9 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdbool.h>
 
-int responsetimeanalysis(int *C,int *T,int *D,int size, int n){
+int responsetimeanalysis(int *C,int *T,int *D,int size, int n,bool block,int *B){
 
   double RWC1, RWC2=0;
   int i, j, k;
@@ -29,7 +30,12 @@ int responsetimeanalysis(int *C,int *T,int *D,int size, int n){
           RWC2 = RWC2+ceil(RWC1/T[j])*C[j];
         //  printf("RWC2d = %f\n", RWC2);
         }
-        RWC2 = RWC2 + C[i];
+        if(block){
+          RWC2 = RWC2 + C[i] + B[i];
+        }
+        else{
+          RWC2 = RWC2 + C[i];
+        }
         // printf("RWC2e = %f\n", RWC2);
         // printf("i = %d\n",i);
         if(RWC2 > D[i]){

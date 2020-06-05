@@ -14,11 +14,11 @@ Sched2 = []
 TasksInSet3 = []
 Sched3 = []
 
-# with open('Dist_Util.csv',newline='') as csv_file:
-#     csv_reader = csv.reader(csv_file,delimiter=',')
-#     for row in csv_reader:
-#         Util.append(row[0])
-#         NTasks.append(row[1])
+with open('Dist_Util.csv',newline='') as csv_file:
+    csv_reader = csv.reader(csv_file,delimiter=',')
+    for row in csv_reader:
+        Util.append(row[0])
+        NTasks.append(row[1])
 
     #language_counter = Counter()
 
