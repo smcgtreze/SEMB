@@ -82,6 +82,60 @@ int leastupperband (int *C,int *P,int t) {
   }
 }
 
+int cpudemand(int *C,int *T,int *D,int size, int n){
+
+    double L1, L2;
+    int i, j, k, counter = 0, accumulator=0;
+
+    L1=0;
+    L2=0;
+    for(k=0; k<size; k++){
+        L1 = L1+C[k];
+    }
+    //printf("RWC1a = %f\n", RWC1);
+    while(L1 != L2){
+        if(L2 != 0) 
+            L1 = L2;
+        //  printf("RWC1b = %f\n", RWC1);
+        //  printf("RWC2c = %f\n", RWC2);
+        L2 = 0;
+
+       //printf("\nAccumulator: %d", accumulator);
+
+        counter ++;
+
+        for(j=0; j<size; j++){
+          L2 = L2+ceil(L1/T[j])*C[j];
+          //printf("L2d = %f\n", L2);
+        }
+        //printf("L2e = %f\n", L2);
+        /*
+        if(L2 > D[size-1]){
+          printf("TASK SET NOT SCHEDULABLE\n");
+          return 0;
+        }
+        */
+        if(L1 == L2){
+            //printf("\nL1: %lf L2: %lf ", L1, L2);
+            //printf("\nRTA: TASK SET %d IS SCHEDULABLE\n", n);
+            return 1;
+        }
+
+        for(i=0;i<size;i++){
+            if(counter % D[i]==0){
+                accumulator += C[i]; 
+            }
+        }
+
+    
+        // printf("RWC2e = %f\n", RWC2);
+        // printf("i = %d\n",i);
+        if(accumulator > counter){
+            //printf("CPU Demand: TASK SET %d NOT SCHEDULABLE\n", n);
+            return 0;
+        }
+    }
+}
 
 int hyperbolic (int *C,int *T,double *u,int t) {
 

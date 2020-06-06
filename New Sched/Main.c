@@ -13,10 +13,13 @@
 
 int main (int argc, char *argv[]){
   char var[20];
-  char *sched_type=argv[1];
+  char sched_type[20];
   double UT_aux;
   int TSS=0;
   int harmonic,blocking;
+
+  printf("Escolha o scheduling rm(Rate monotonic) ou dm(Deadline monotonic) \n");
+  scanf("%s",sched_type);
   printf("Escolha uma variável para manter constante UT ou TSS (Task Set Size) \n");
   scanf("%s",var);
   if(strcmp(var,"UT") == 0){
@@ -100,7 +103,7 @@ int main (int argc, char *argv[]){
     double *aux3 = malloc(sizeof(double)*size*Nsets);
     double *aux4 = malloc(sizeof(double)*size*Nsets);
     double sum=0.0;
-    int positive =0, positive2 =0,indetermined = 0, counter=0, rta_counter= 0, rows, i, n_sem;
+    int positive =0, positive2 =0,positive3=0 ,indetermined = 0, counter=0, rta_counter= 0, rows, i, n_sem;
 
     srand((unsigned)(time(NULL)*(unsigned int)(UT*100*t))); // dá reset à seed do Rand a cada iteração
     memset(histograma,0,0);
@@ -124,7 +127,7 @@ int main (int argc, char *argv[]){
           for(int i=0;i < t;i++){
               if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
               else{period[i]= 2*(1+rand()%(MAXPERIOD));}// Ti evenly divides Ti+1
-              C[i]= rand()%(period[i]) ; // the computation time C i uniform in [0,Ti]
+               C[i]= 1+ rand()%(period[i]); // the computation time C i uniform in [0,Ti]
           }
           qsort(period,t,sizeof(int),cmpfunc_int);
 
@@ -138,8 +141,8 @@ int main (int argc, char *argv[]){
           for(int i=0;i < t;i++){
               if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
               else{period[i]= 2*(1+rand()%(MAXPERIOD));}
-              deadline[i]= rand()%(period[i]); // D <= P
-              C[i]= rand()%(period[i]); 
+              deadline[i]= 1 + rand()%(period[i]);
+              C[i]= 1+ rand()%(period[i]); 
           }
 
           qsort(deadline,t,sizeof(int),cmpfunc_int);
@@ -166,7 +169,7 @@ int main (int argc, char *argv[]){
                 if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                 else{period[i]= 2*(1+rand()%(MAXPERIOD));}
                 if(strcmp(sched_type,"dm") == 0){
-                  deadline[i]= rand()%(period[i]); // D <= P
+                 deadline[i]= 1 + rand()%(period[i]);
                 }
               }
 
@@ -177,7 +180,7 @@ int main (int argc, char *argv[]){
                 if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                 else{period[i]= 2*(1+rand()%(MAXPERIOD));}
                 if(strcmp(sched_type,"dm") == 0){
-                  deadline[i]= rand()%(period[i]); // D <= P
+                 deadline[i]= 1 + rand()%(period[i]);
                 } 
                 
                 while(i < t -1){
@@ -187,7 +190,7 @@ int main (int argc, char *argv[]){
                   if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                   else{period[i]= 2*(1+rand()%(MAXPERIOD));}
                   if(strcmp(sched_type,"dm") == 0){
-                    deadline[i]= rand()%(period[i]); // D <= P
+                   deadline[i]= 1 + rand()%(period[i]);
                   } 
                 }         
               }
@@ -195,7 +198,7 @@ int main (int argc, char *argv[]){
                   if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                   else{period[i]= 2*(1+rand()%(MAXPERIOD));}
                   if(strcmp(sched_type,"dm") == 0){
-                    deadline[i]= rand()%(period[i]); // D <= P
+                   deadline[i]= 1 + rand()%(period[i]);
                   } 
               }
         }
@@ -216,11 +219,10 @@ int main (int argc, char *argv[]){
             Sched_AddT(deadline[i],period[i],i,C[i]);
             TaskSet_Add(i,j,Tasks[i]);                     
       }
-
         //HYPERBOLIC BOUND (rm Utilization)
         if(strcmp(sched_type,"rm") == 0){
           if(hyperbolic(deadline,period,util,t) == 1){
-              // printf("\nHyperbolic :Task Set %d is schedulable\n",j);
+              //printf("\nHyperbolic :Task Set %d is schedulable\n",j);
               positive++;
           }
 
@@ -299,6 +301,12 @@ int main (int argc, char *argv[]){
             counter = 0;
         }
 
+
+      //CPU DEMAND ANALYSIS
+      if(cpudemand(C,period,deadline,t,j)==1){
+        positive3++;
+      }
+
     //Calculation of the distribution of the utilizations
     for(int z = 0; z < t;z++){
         //  printf("\nSet %d/%d\n",j,Nsets-1);
@@ -345,6 +353,7 @@ int main (int argc, char *argv[]){
     printf("LUB Condition :%.4f dos task sets são escalonáveis\n",((double)1.0*positive2/Nsets));
     printf("LUB Condition :%.4f dos task sets são indeterminados\n",((double)1.0*indetermined/Nsets));
     printf("RTA Condition :%.4f dos task sets são escalonáveis\n",((double)1.0*rta_counter/Nsets));
+    printf("EDF CPU Demand Analysis :%.4f dos task sets são escalonáveis\n",((double)1.0*positive3/Nsets));
     printf("Number of tasks per Set :%d\n",t);
     printf("Number of Sets :%d\n",Nsets);
     printf("Total Average Utilization :%.4lf\n",average(aux0,Nsets));
@@ -356,6 +365,7 @@ int main (int argc, char *argv[]){
     save("Hyperbolic.csv",((double)1.0*positive/Nsets),0,t,UT,var);
     save("LUB.csv",(double)(1.0*positive2/Nsets),0,t,UT,var);
     save("RTA.csv",(double)(1.0*rta_counter/Nsets),0,t,UT,var);
+    save("CPU_Demand.csv",(double)(1.0*positive3/Nsets),0,t,UT,var);
     if(t == TaskSetSize)
       save_hist("Dist_Util.csv",histograma,Bars);
 
@@ -370,7 +380,7 @@ int main (int argc, char *argv[]){
     free(aux3);
     free(aux4);
   }
-  }
+}
 FILE* file;
 file= fopen("info.txt","w");
 
