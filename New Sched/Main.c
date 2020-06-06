@@ -13,6 +13,7 @@
 
 int main (int argc, char *argv[]){
   char var[20];
+  char *sched_type=argv[1];
   double UT_aux;
   int TSS=0;
   int harmonic,blocking;
@@ -73,7 +74,8 @@ int main (int argc, char *argv[]){
   remove("LUB.csv");
   remove("RTA.csv");
   remove("Dist_Util.csv");
-  remove("Priority Inheritances.txt");     
+  remove("Priority Inheritances.txt");  
+  remove("info.txt");   
 
   for(double UT=UT_MIN;UT < UT_MAX+UT_int;UT+= UT_int){
   for(int t=SetSizeMin;t < TaskSetSize+1;t++){
@@ -111,7 +113,6 @@ int main (int argc, char *argv[]){
     memset(deadline,0,0);
     memset(util,0,0);
     memset(period,0,0);
-    char *sched_type= argv[1]; // the type of scheduling is passed as a argument in the terminal
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     for(int j=0;j < Nsets;j++){
@@ -370,5 +371,15 @@ int main (int argc, char *argv[]){
     free(aux4);
   }
   }
+FILE* file;
+file= fopen("info.txt","w");
+
+if(file == NULL){
+  printf("Erro a abrir o ficheiro\n");
+}
+fprintf(file,"%s\n",sched_type);
+fprintf(file,"%s\n",var);
+fprintf(file,"%d\n",harmonic);
+fprintf(file,"%d\n",blocking);
 
 }

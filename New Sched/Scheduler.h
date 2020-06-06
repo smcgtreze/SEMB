@@ -1,5 +1,5 @@
 #define MaxTaskSetSize 50
-#define Nsets 100000
+#define Nsets 10000
 #define Bars 20
 #define ISize 0.050
 #define UT_int 0.01
