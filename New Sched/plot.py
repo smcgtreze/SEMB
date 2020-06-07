@@ -16,11 +16,11 @@ Sched3 = []
 TasksInSet4 = []
 Sched4 = []
 
-with open('Dist_Util.csv',newline='') as csv_file:
-    csv_reader = csv.reader(csv_file,delimiter=',')
-    for row in csv_reader:
-        Util.append(row[0])
-        NTasks.append(row[1])
+# with open('Dist_Util.csv',newline='') as csv_file:
+#     csv_reader = csv.reader(csv_file,delimiter=',')
+#     for row in csv_reader:
+#         Util.append(row[0])
+#         NTasks.append(row[1])
 
     #language_counter = Counter()
 
@@ -119,7 +119,7 @@ if var == "TSS\n":
 plt.gcf().autofmt_xdate()
 
 plt.figure(4)
-plt.plot(TasksInSet3,Sched3, color='#444444')
+plt.plot(TasksInSet4,Sched4, color='#444444')
 plt.title("EDF Schedulability according to CPU Demand")
 plt.ylabel("Acceptance Ratio")
 if var == "UT\n":

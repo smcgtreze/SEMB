@@ -126,7 +126,7 @@ int* gen_ceil(int rows, int columns, int cri_sen[rows][columns]){
 }
 
 
-int * calc_b(int * set, int n_tasks, int n_sem, int taskset_id, double TAU){
+int * calc_b(int * set, int n_tasks, int n_sem, int taskset_id, double TAU,int save_priority){
     
     int i = 0, k = 0, j, D_max;
     int *Bl, *Bs, *C_sem, *B;
@@ -149,44 +149,46 @@ int * calc_b(int * set, int n_tasks, int n_sem, int taskset_id, double TAU){
     
     gen_cri_sen(set, n_tasks, n_sem, cri_sec);
 
-    fprintf(file,"\n\n   PRIORITY INHERITANCE PROTOCOL\n\n");
-
-    fprintf(file,"\n Taskset: %d \n", taskset_id);
-
-    fprintf(file,"\n Total Average Utilization: %lf \n", TAU);
-
-    fprintf(file,"\n\n Critical Sections Matrix:\n  ");
-
-    for(k=0;k<n_sem;k++)
-        fprintf(file," S%d", k+1);
-    fprintf(file,"\n");
-
-    for(i=0;i<n_tasks;i++){
-        fprintf(file,"T%d ", i+1);
-        for(k=0;k<n_sem;k++)
-            fprintf(file," %d ", cri_sec[i][k]);
-
-        fprintf(file,"\n");
+   if(save_priority){
+        fprintf(file,"\n\n   PRIORITY INHERITANCE PROTOCOL\n\n");
     }
 
-    fprintf(file,"\n");
+    if(save_priority){fprintf(file,"\n Taskset: %d \n", taskset_id);}
+
+    if(save_priority){fprintf(file,"\n Total Average Utilization: %lf \n", TAU);}
+
+    if(save_priority){fprintf(file,"\n\n Critical Sections Matrix:\n  ");}
+
+    for(k=0;k<n_sem;k++)
+        if(save_priority){fprintf(file," S%d", k+1);}
+    if(save_priority){fprintf(file,"\n");}
+
+    for(i=0;i<n_tasks;i++){
+        if(save_priority){fprintf(file,"T%d ", i+1);}
+        for(k=0;k<n_sem;k++)
+            if(save_priority){fprintf(file," %d ", cri_sec[i][k]);}
+
+        if(save_priority){fprintf(file,"\n");}
+    }
+
+    if(save_priority){fprintf(file,"\n");}
 
 
     C_sem = gen_ceil(n_tasks, n_sem, cri_sec);
 
-    fprintf(file,"\nSemaphores Ceiling: ");
+    if(save_priority){fprintf(file,"\nSemaphores Ceiling: ");}
 
-    fprintf(file,"\n");
-
-    for(i=0;i<n_sem;i++)
-        fprintf(file,"S%d ", i+1);
-
-    fprintf(file,"\n");
+    if(save_priority){fprintf(file,"\n");}
 
     for(i=0;i<n_sem;i++)
-        fprintf(file,"P%d ", (C_sem[i]+1));
+        if(save_priority){fprintf(file,"S%d ", i+1);}
 
-    fprintf(file,"\n");
+    if(save_priority){fprintf(file,"\n");}
+
+    for(i=0;i<n_sem;i++)
+        if(save_priority){fprintf(file,"P%d ", (C_sem[i]+1));}
+
+    if(save_priority){fprintf(file,"\n");}
 
 
     for (i=0;i<(n_tasks-1);i++){
@@ -230,9 +232,9 @@ int * calc_b(int * set, int n_tasks, int n_sem, int taskset_id, double TAU){
 
     
     for(i=0;i<n_tasks;i++)
-        fprintf(file,"\nB%d : %d", i, B[i]);
+        if(save_priority){fprintf(file,"\nB%d : %d", i, B[i]);}
     
-    fprintf(file,"\n\n\n\n");
+    if(save_priority){fprintf(file,"\n\n\n\n");}
 
     fclose(file);
 

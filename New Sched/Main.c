@@ -16,7 +16,7 @@ int main (int argc, char *argv[]){
   char sched_type[20];
   double UT_aux;
   int TSS=0;
-  int harmonic,blocking;
+  int harmonic,blocking,save_priority;
 
   printf("Escolha o scheduling rm(Rate monotonic) ou dm(Deadline monotonic) \n");
   scanf("%s",sched_type);
@@ -62,6 +62,8 @@ int main (int argc, char *argv[]){
 
   printf("Periodos harmónicos (1/0)?\n");
   scanf("%d",&harmonic);
+  printf("Guardar as priority inheritances num ficheiro(1/0)?\n");
+  scanf("%d",&save_priority);
   printf("Cálculo do RTA com blocking times(1/0)?\n");
   scanf("%d",&blocking);
   //strcpy(var,"TSS");
@@ -78,6 +80,7 @@ int main (int argc, char *argv[]){
   remove("RTA.csv");
   remove("Dist_Util.csv");
   remove("Priority Inheritances.txt");  
+  remove("CPU_Demand.csv");
   remove("info.txt");   
 
   for(double UT=UT_MIN;UT < UT_MAX+UT_int;UT+= UT_int){
@@ -274,7 +277,7 @@ int main (int argc, char *argv[]){
 
           // printf("\n\n------------------------------------\n");
 
-          B = calc_b(period, rows, n_sem, j, UT); //array that contains the blocking times
+          B = calc_b(period, rows, n_sem, j, UT,save_priority); //array that contains the blocking times
         }
         
         //RESPONSE TIME ANALYSIS
@@ -357,15 +360,16 @@ int main (int argc, char *argv[]){
     printf("Number of tasks per Set :%d\n",t);
     printf("Number of Sets :%d\n",Nsets);
     printf("Total Average Utilization :%.4lf\n",average(aux0,Nsets));
-    printf("Total Period Average :%.4f\n",average(aux1,Nsets));
-    printf("Total Deadline Average :%.4f\n",average(aux2,Nsets));
-    printf("Total Execution time Average :%.4f\n",average(aux3,Nsets));
-    printf("Total Blocking time Average :%.4f\n",average(aux4,Nsets));
+    // printf("Total Period Average :%.4f\n",average(aux1,Nsets));
+    // printf("Total Deadline Average :%.4f\n",average(aux2,Nsets));
+    // printf("Total Execution time Average :%.4f\n",average(aux3,Nsets));
+    // printf("Total Blocking time Average :%.4f\n",average(aux4,Nsets));
 
     save("Hyperbolic.csv",((double)1.0*positive/Nsets),0,t,UT,var);
     save("LUB.csv",(double)(1.0*positive2/Nsets),0,t,UT,var);
     save("RTA.csv",(double)(1.0*rta_counter/Nsets),0,t,UT,var);
     save("CPU_Demand.csv",(double)(1.0*positive3/Nsets),0,t,UT,var);
+    
     if(t == TaskSetSize)
       save_hist("Dist_Util.csv",histograma,Bars);
 
