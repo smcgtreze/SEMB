@@ -16,7 +16,7 @@ int main (int argc, char *argv[]){
   char sched_type[20];
   double UT_aux;
   int TSS=0;
-  int harmonic,blocking,save_priority;
+  int harmonic,blocking,save_priority,save_taskinfo;
 
   printf("Escolha o scheduling rm(Rate monotonic) ou dm(Deadline monotonic) \n");
   scanf("%s",sched_type);
@@ -60,12 +60,14 @@ int main (int argc, char *argv[]){
     return 0;
   }
 
-  printf("Periodos harmónicos (1/0)?\n");
-  scanf("%d",&harmonic);
+  // printf("Periodos harmónicos (1/0)?\n");
+  // scanf("%d",&harmonic);
   printf("Guardar as priority inheritances num ficheiro(1/0)?\n");
   scanf("%d",&save_priority);
   printf("Cálculo do RTA com blocking times(1/0)?\n");
   scanf("%d",&blocking);
+  printf("Guardar as parâmetros relativos às tasks num ficheiro(1/0)?\n");
+  scanf("%d",&save_taskinfo);
   //strcpy(var,"TSS");
   //strcpy(var,"UT");
 
@@ -81,7 +83,11 @@ int main (int argc, char *argv[]){
   remove("Dist_Util.csv");
   remove("Priority Inheritances.txt");  
   remove("CPU_Demand.csv");
-  remove("info.txt");   
+  remove("info.txt");
+  remove("task_info.txt");   
+
+  FILE * task_info;
+  task_info = fopen("task_info.txt","w");
 
   for(double UT=UT_MIN;UT < UT_MAX+UT_int;UT+= UT_int){
   for(int t=SetSizeMin;t < TaskSetSize+1;t++){
@@ -128,8 +134,8 @@ int main (int argc, char *argv[]){
         //Rate monotonic
         if(strcmp(sched_type,"rm") == 0){
           for(int i=0;i < t;i++){
-              if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
-              else{period[i]= 2*(1+rand()%(MAXPERIOD));}// Ti evenly divides Ti+1
+              //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+              period[i]= 2*(1+rand()%(MAXPERIOD));// Ti evenly divides Ti+1
                C[i]= 1+ rand()%(period[i]); // the computation time C i uniform in [0,Ti]
           }
           qsort(period,t,sizeof(int),cmpfunc_int);
@@ -142,8 +148,8 @@ int main (int argc, char *argv[]){
         //Deadline monotonic
         if(strcmp(sched_type,"dm") == 0){
           for(int i=0;i < t;i++){
-              if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
-              else{period[i]= 2*(1+rand()%(MAXPERIOD));}
+             //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+              period[i]= 2*(1+rand()%(MAXPERIOD));
               deadline[i]= 1 + rand()%(period[i]);
               C[i]= 1+ rand()%(period[i]); 
           }
@@ -169,8 +175,8 @@ int main (int argc, char *argv[]){
                 sum=sum-util[i];
                 util[i] = (UT*t - sum);
                 sum+=util[i];
-                if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
-                else{period[i]= 2*(1+rand()%(MAXPERIOD));}
+                //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+                period[i]= 2*(1+rand()%(MAXPERIOD));
                 if(strcmp(sched_type,"dm") == 0){
                  deadline[i]= 1 + rand()%(period[i]);
                 }
@@ -180,8 +186,8 @@ int main (int argc, char *argv[]){
                 sum=sum-util[i];
                 util[i] = (UT*t - sum)/(t - i);
                 sum+=util[i];
-                if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
-                else{period[i]= 2*(1+rand()%(MAXPERIOD));}
+                //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+                period[i]= 2*(1+rand()%(MAXPERIOD));
                 if(strcmp(sched_type,"dm") == 0){
                  deadline[i]= 1 + rand()%(period[i]);
                 } 
@@ -190,16 +196,16 @@ int main (int argc, char *argv[]){
                   ++i;
                   util[i]=util[i-1];
                   sum+=util[i];
-                  if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
-                  else{period[i]= 2*(1+rand()%(MAXPERIOD));}
+                  //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+                  period[i]= 2*(1+rand()%(MAXPERIOD));
                   if(strcmp(sched_type,"dm") == 0){
                    deadline[i]= 1 + rand()%(period[i]);
                   } 
                 }         
               }
               else{
-                  if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
-                  else{period[i]= 2*(1+rand()%(MAXPERIOD));}
+                  //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
+                  period[i]= 2*(1+rand()%(MAXPERIOD));
                   if(strcmp(sched_type,"dm") == 0){
                    deadline[i]= 1 + rand()%(period[i]);
                   } 
@@ -312,13 +318,15 @@ int main (int argc, char *argv[]){
 
     //Calculation of the distribution of the utilizations
     for(int z = 0; z < t;z++){
-        //  printf("\nSet %d/%d\n",j,Nsets-1);
-        //  printf("Task %d/%d\n",z,t-1);
-        //  printf("Period %d\n",period[z]);
-        //  printf("Execution time %d\n",C[z]);
-        //  printf("Deadline %d\n",deadline[z]);
-        //  printf("Utilization %lf\n",util[z]);
-        //  printf("Blocking time %d\n",B[z]);
+        if(save_taskinfo){
+         fprintf(task_info,"\nSet %d/%d\n",j,Nsets-1);
+         fprintf(task_info,"Task %d/%d\n",z,t-1);
+         fprintf(task_info,"Period %d\n",period[z]);
+         fprintf(task_info,"Execution time %d\n",C[z]);
+         fprintf(task_info,"Deadline %d\n",deadline[z]);
+         fprintf(task_info,"Utilization %lf\n",util[z]);
+         fprintf(task_info,"Blocking time %d\n",B[z]);
+        }
       for (int n = 0;n < Bars ;n++){
         if((util[z] >= n*(ISize)) && (util[z] < (n+1)*ISize)){
           histograma[n]++;
@@ -360,10 +368,10 @@ int main (int argc, char *argv[]){
     printf("Number of tasks per Set :%d\n",t);
     printf("Number of Sets :%d\n",Nsets);
     printf("Total Average Utilization :%.4lf\n",average(aux0,Nsets));
-    // printf("Total Period Average :%.4f\n",average(aux1,Nsets));
-    // printf("Total Deadline Average :%.4f\n",average(aux2,Nsets));
-    // printf("Total Execution time Average :%.4f\n",average(aux3,Nsets));
-    // printf("Total Blocking time Average :%.4f\n",average(aux4,Nsets));
+    printf("Total Period Average :%.4f\n",average(aux1,Nsets)/t);
+    printf("Total Deadline Average :%.4f\n",average(aux2,Nsets)/t);
+    printf("Total Execution time Average :%.4f\n",average(aux3,Nsets)/t);
+    printf("Total Blocking time Average :%.4f\n",average(aux4,Nsets)/t);
 
     save("Hyperbolic.csv",((double)1.0*positive/Nsets),0,t,UT,var);
     save("LUB.csv",(double)(1.0*positive2/Nsets),0,t,UT,var);
@@ -393,7 +401,9 @@ if(file == NULL){
 }
 fprintf(file,"%s\n",sched_type);
 fprintf(file,"%s\n",var);
-fprintf(file,"%d\n",harmonic);
+if(strcmp(var,"UT") == 0){fprintf(file,"%.2lf\n",UT_aux);}
+if(strcmp(var,"TSS") == 0){fprintf(file,"%d\n",TSS);}
+// fprintf(file,"%d\n",harmonic);
 fprintf(file,"%d\n",blocking);
 
 }

@@ -30,7 +30,7 @@ Sched4 = []
 with open('info.txt', 'r') as file:
     sched = file.readline()
     var = file.readline()
-    harm = file.readline()
+    par = file.readline()
     bloc = file.readline()
 
 with open('LUB.csv',newline='') as csv_file:
@@ -90,32 +90,32 @@ plt.yticks(fontsize=11)
 
 plt.figure(1)
 plt.plot(TasksInSet, Sched, color='#8C2D19')
-plt.title("Schedulability according to LUB")
+plt.title("Schedulability according to LUB"+" "+sched)
 plt.ylabel("Acceptance Ratio")
 if var == "UT\n":
-    plt.xlabel("Number of Tasks per Set")
+    plt.xlabel("Number of Tasks per Set"+" U="+par)
 if var == "TSS\n":
-    plt.xlabel("Average Utilization of the Set")
+    plt.xlabel("Average Utilization of the Set"+" TSS="+par)
 plt.gcf().autofmt_xdate()
 
 plt.figure(2)
 plt.plot(TasksInSet2,Sched2)
-plt.title("Schedulability in HC")
+plt.title("Schedulability in HC"+" "+sched)
 plt.ylabel("Acceptance Ratio")
 if var == "UT\n":
-    plt.xlabel("Number of Tasks per Set")
+    plt.xlabel("Number of Tasks per Set"+" U="+par)
 if var == "TSS\n":
-    plt.xlabel("Average Utilization of the Set")
+    plt.xlabel("Average Utilization of the Set"+" TSS="+par)
 plt.gcf().autofmt_xdate()
 
 plt.figure(3)
 plt.plot(TasksInSet3,Sched3, color='#444444')
-plt.title("Schedulability according to RTA")
-plt.ylabel("Acceptance Ratio")
+plt.title("Schedulability according to RTA"+" "+sched)
+plt.ylabel("Acceptance Ratio"+" B"+bloc)
 if var == "UT\n":
-    plt.xlabel("Number of Tasks per Set")
+    plt.xlabel("Number of Tasks per Set"+" U="+par)
 if var == "TSS\n":
-    plt.xlabel("Average Utilization of the Set")
+    plt.xlabel("Average Utilization of the Set"+" TSS="+par)
 plt.gcf().autofmt_xdate()
 
 plt.figure(4)
@@ -123,9 +123,9 @@ plt.plot(TasksInSet4,Sched4, color='#444444')
 plt.title("EDF Schedulability according to CPU Demand")
 plt.ylabel("Acceptance Ratio")
 if var == "UT\n":
-    plt.xlabel("Number of Tasks per Set")
+    plt.xlabel("Number of Tasks per Set"+" U="+par)
 if var == "TSS\n":
-    plt.xlabel("Average Utilization of the Set")
+    plt.xlabel("Average Utilization of the Set"+" TSS="+par)
 plt.gcf().autofmt_xdate()
 
 # plt.figure(5)

@@ -3,8 +3,8 @@
 #define Bars 20
 #define ISize 0.050
 #define UT_int 0.01
-#define MAXN 13 // Max Harmonic Period Exponential (Should be 2^MAXN = MAXPERIOD for a fair comparison between Harmonic and not Harmonic) 
-#define MAXPERIOD 8192
+#define MAXN 23 // Max Harmonic Period Exponential (Should be 2^(MAXN) = MAXPERIOD for a fair comparison between Harmonic and not Harmonic) 
+#define MAXPERIOD 100000
 
  /*task periods are more
 deterministic, since are defined by the user and then enforced by the operating system
