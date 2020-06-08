@@ -6,9 +6,6 @@
 
 int cur_task=MaxTaskSetSize; // 0-> High 19->Low
 
-void Sched_Init(int TaskSetSize){
-    for(int x=0; x<TaskSetSize ; x++);
-}
 
 int Sched_AddT(int d, int p,int pri,int c){
     //for(int x=0; x<20; x++)

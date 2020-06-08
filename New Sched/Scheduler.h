@@ -37,11 +37,6 @@ double UT_MAX;
 double UT_MIN;
 // int cur_task = 20; // 0-> High 19->Low
 
-void Sched_Init(int TaskSetSize);
-/* - Initialise data
-* structures.
-*
-*/
 
 void Sched_Schedule(int TaskSetSize);
 /* Verifies if any

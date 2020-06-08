@@ -1,6 +1,5 @@
 double average(double *vetor,int size);
 double average_int(int *vetor,int size);
-void Func_init(int task);
 int cmpfunc (const void * a, const void * b);
 int cmpfunc_int (const void * a, const void * b);
 void reorder(int *a, int *b, int n) ;

@@ -7,8 +7,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
-double avg=0.0;
-int count=0;
 
 double average(double *vetor,int size){
 	double soma=0.0;
@@ -28,15 +26,6 @@ double average_int(int *vetor,int size){
     // printf("Soma:%lf\n",soma);
 	}
 	return (soma/size);
-}
-
-void Func_init(int task){
-    clock_t before = clock();
-    for(int i=0;i < 10*CLOCKS_PER_SEC;i++);
-    clock_t difference = clock() - before;
-    printf("Task %d:execution time:%ld ms\n",task,difference*1000/CLOCKS_PER_SEC);
-    avg += difference*1000/CLOCKS_PER_SEC;
-    count++;
 }
 
 

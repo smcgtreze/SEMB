@@ -93,7 +93,6 @@ int main (int argc, char *argv[]){
 
   for(double UT=UT_MIN;UT < UT_MAX+UT_int;UT+= UT_int){
   for(int t=SetSizeMin;t < TaskSetSize+1;t++){
-    Sched_Init(t);
 
     //Tamanho dos dados
     int size,*B; 
@@ -138,7 +137,7 @@ int main (int argc, char *argv[]){
           for(int i=0;i < t;i++){
               //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
               period[i]= 2*(1+rand()%(MAXPERIOD));// Ti evenly divides Ti+1
-               C[i]= 1+ rand()%(period[i]); // the computation time C i uniform in [0,Ti]
+               C[i]= 1+ rand()%(period[i]); // the computation time C i uniform in [1,Ti]
           }
           qsort(period,t,sizeof(int),cmpfunc_int);
 
@@ -152,7 +151,7 @@ int main (int argc, char *argv[]){
           for(int i=0;i < t;i++){
              //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
               period[i]= 2*(1+rand()%(MAXPERIOD));
-              deadline[i]= 1 + rand()%(period[i]);
+              deadline[i]= 1 + rand()%(period[i]); //// deadline = [1, period]
               C[i]= 1+ rand()%(period[i]); 
           }
 
@@ -165,6 +164,8 @@ int main (int argc, char *argv[]){
 
         qsort(util,t,sizeof(double),cmpfunc);
 
+
+        //carateristico do UUnisort (algoritmo de geração de tasks)
         for(int z=0;z < t-1;z++){
             util[z] = util[z+1] - util[z]; 
         }
