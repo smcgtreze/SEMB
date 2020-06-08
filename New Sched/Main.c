@@ -93,6 +93,7 @@ int main (int argc, char *argv[]){
 
   for(double UT=UT_MIN;UT < UT_MAX+UT_int;UT+= UT_int){
   for(int t=SetSizeMin;t < TaskSetSize+1;t++){
+    Sched_Init(t);
 
     //Tamanho dos dados
     int size,*B; 
@@ -137,7 +138,7 @@ int main (int argc, char *argv[]){
           for(int i=0;i < t;i++){
               //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
               period[i]= 2*(1+rand()%(MAXPERIOD));// Ti evenly divides Ti+1
-               C[i]= 1+ rand()%(period[i]); // the computation time C i uniform in [1,Ti]
+               C[i]= 1+ rand()%(period[i]); // the computation time C i uniform in [0,Ti]
           }
           qsort(period,t,sizeof(int),cmpfunc_int);
 
@@ -151,8 +152,8 @@ int main (int argc, char *argv[]){
           for(int i=0;i < t;i++){
              //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
               period[i]= 2*(1+rand()%(MAXPERIOD));
-              deadline[i]= 1 + rand()%(period[i]); //// deadline = [1, period]
-              C[i]= 1+ rand()%(period[i]); 
+              deadline[i]= 1 + rand()%(period[i]);
+              C[i]= 1+ rand()%(deadline[i]); //tempo de execução sempre menor que o deadline
           }
 
           qsort(deadline,t,sizeof(int),cmpfunc_int);
@@ -162,10 +163,9 @@ int main (int argc, char *argv[]){
           }
         }
 
+        //Característico do UUnisort
         qsort(util,t,sizeof(double),cmpfunc);
 
-
-        //carateristico do UUnisort (algoritmo de geração de tasks)
         for(int z=0;z < t-1;z++){
             util[z] = util[z+1] - util[z]; 
         }
@@ -174,20 +174,20 @@ int main (int argc, char *argv[]){
         for(int i=0;i < t;i++){
               sum+=util[i];
 
-              if((sum < UT*t) && (i == (t-1))){
+              if((sum < UT*t) && (i == t-1)){ //apenas é necessário alterar a utilização da última task
                 sum=sum-util[i];
-                util[i] = (UT*t - sum);
+                util[i] = (UT*t - sum); //A utilização atribuída é a diferença entre a soma de utilização necessária e a soma atual
                 sum+=util[i];
                 //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
-                period[i]= 2*(1+rand()%(MAXPERIOD));
+                period[i]= 2*(1+rand()%(MAXPERIOD)); //recalcular os períodos
                 if(strcmp(sched_type,"dm") == 0){
                  deadline[i]= 1 + rand()%(period[i]);
                 }
               }
 
-              else if((sum > UT*t) && (i <= (t-1))){
+              if((sum > UT*t) && (i < t)){ //é necessário alterar a utilização desde a task em que a soma de utilizações foi ultrapassada
                 sum=sum-util[i];
-                util[i] = (UT*t - sum)/(t - i);
+                util[i] = (UT*t - sum)/(t - i);//A utilização atribuída é a diferença entre a soma de utilização necessária e a soma atual a dividir pelas tasks que faltam
                 sum+=util[i];
                 //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                 period[i]= 2*(1+rand()%(MAXPERIOD));
@@ -195,9 +195,9 @@ int main (int argc, char *argv[]){
                  deadline[i]= 1 + rand()%(period[i]);
                 } 
                 
-                while(i < t -1){
+                while(i < t ){
                   ++i;
-                  util[i]=util[i-1];
+                  util[i]=util[i-1]; // a utilização da task é igual á utilização da anterior, isto é a diferença de somas/nºde tasks no set
                   sum+=util[i];
                   //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                   period[i]= 2*(1+rand()%(MAXPERIOD));
@@ -206,7 +206,7 @@ int main (int argc, char *argv[]){
                   } 
                 }         
               }
-              else{
+              else{ // casos em que nenhum deles se verifica
                   //if(harmonic){period[i] = pow(2,(rand()%(MAXN)));}
                   period[i]= 2*(1+rand()%(MAXPERIOD));
                   if(strcmp(sched_type,"dm") == 0){
@@ -346,7 +346,6 @@ int main (int argc, char *argv[]){
     set[j].avgExecutingtime = average_int(C,t);
     set[j].avgBlockingtime = average_int(B,t);
    }
-  
 
     for (int j = 0; j < Nsets;j++){
       aux0[j] = (double) set[j].avgUtil;
@@ -372,7 +371,7 @@ int main (int argc, char *argv[]){
     printf("EDF CPU Demand Analysis :%.4f dos task sets são escalonáveis\n",((double)1.0*positive3/Nsets));
     printf("Number of tasks per Set :%d\n",t);
     printf("Number of Sets :%d\n",Nsets);
-    printf("Total Average Utilization :%.4lf\n",average(aux0,Nsets));
+    printf("Total Average Utilization per task of a set:%.4lf\n",average(aux0,Nsets));
     printf("Total Period Average :%.4f\n",average(aux1,Nsets)/t);
     printf("Total Deadline Average :%.4f\n",average(aux2,Nsets)/t);
     printf("Total Execution time Average :%.4f\n",average(aux3,Nsets)/t);
