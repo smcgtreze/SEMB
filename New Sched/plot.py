@@ -119,7 +119,7 @@ if var == "TSS\n":
 plt.gcf().autofmt_xdate()
 
 plt.figure(4)
-plt.plot(TasksInSet4,Sched4, color='#444444')
+plt.plot(TasksInSet4,Sched4, color='#D5FF00')
 plt.title("EDF Schedulability according to CPU Demand")
 plt.ylabel("Acceptance Ratio")
 if var == "UT\n":

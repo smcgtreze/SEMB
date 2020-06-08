@@ -84,7 +84,7 @@ int leastupperband (int *C,int *P,int t) {
 
 int cpudemand(int *C,int *T,int *D,int size, int n){
 
-    double L1, L2;
+    double L1, L2,L0;
     int i, j, k, counter = 0, accumulator=0;
 
     // FILE* file;
@@ -92,13 +92,16 @@ int cpudemand(int *C,int *T,int *D,int size, int n){
 
     L1=0;
     L2=0;
+    L0=0;
     for(k=0; k<size; k++){
         L1 = L1+C[k];
     }
     //printf("RWC1a = %f\n", RWC1);
     while(1){
-        if(L2 != 0) 
+        if(L2 != 0){
+            L0 = L1;
             L1 = L2;
+        }
         //  printf("RWC1b = %f\n", RWC1);
         //  printf("RWC2c = %f\n", RWC2);
         L2 = 0;
@@ -112,12 +115,17 @@ int cpudemand(int *C,int *T,int *D,int size, int n){
           L2 = L2+ceil(L1/T[j])*C[j];
           //printf("L2d = %f\n", L2);
         }
+
+        if(abs(L0-L1) < abs(L2-L1)){
+          return 0; //Tá a divergir
+        }
+
         //printf("L2e = %f\n", L2);
         
-        if(L2 > D[size-1]){
-          //printf("TASK SET NOT SCHEDULABLE\n");
-          return 0;
-        }
+        // if(L2 > D[size-1]){
+        //   //printf("TASK SET NOT SCHEDULABLE\n");
+        //   return 0;
+        // }
 
         for(i=0;i<size;i++){
             if(counter % D[i]==0){
@@ -139,6 +147,7 @@ int cpudemand(int *C,int *T,int *D,int size, int n){
             }
         }
     }
+    return 1;
 }
 
 int hyperbolic (int *C,int *T,double *u,int t) {
