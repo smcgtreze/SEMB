@@ -16,7 +16,7 @@ int main (int argc, char *argv[]){
   char sched_type[20];
   double UT_aux;
   int TSS=0;
-  int harmonic,blocking,save_priority,save_taskinfo;
+  int harmonic,blocking,save_priority,save_taskinfo,CPU_EDF;
 
   printf("Escolha o scheduling rm(Rate monotonic) ou dm(Deadline monotonic) \n");
   scanf("%s",sched_type);
@@ -68,6 +68,8 @@ int main (int argc, char *argv[]){
   scanf("%d",&blocking);
   printf("Guardar as parâmetros relativos às tasks num ficheiro(1/0)?\n");
   scanf("%d",&save_taskinfo);
+  printf("Cálculos do CPU demand para EDF(1/0)?\n");
+  scanf("%d",&CPU_EDF);
   //strcpy(var,"TSS");
   //strcpy(var,"UT");
 
@@ -312,9 +314,11 @@ int main (int argc, char *argv[]){
 
 
       //CPU DEMAND ANALYSIS
-      if(cpudemand(C,period,deadline,t,j)==1){
+      if(CPU_EDF){
+        if(cpudemand(C,period,deadline,t,j)==1){
         positive3++;
       }
+    }
 
     //Calculation of the distribution of the utilizations
     for(int z = 0; z < t;z++){
